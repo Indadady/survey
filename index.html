@@ -84,7 +84,7 @@
   .hero::after { bottom: -40px; left: -40px; width: 180px; height: 180px; background: rgba(10,122,110,0.2); }
   
   .logo-container { position: absolute; top: 24px; left: 24px; z-index: 10; }
-  .logo-container img { max-height: 28px; filter: brightness(0) invert(1); }
+  .logo-container img { max-height: 24px; filter: brightness(0) invert(1); }
   
   .hero h1 { font-size: clamp(24px, 5vw, 32px); font-weight: 700; margin-bottom: 12px; position: relative; z-index: 1; letter-spacing: -0.5px; }
   .hero p { font-size: 15px; color: rgba(255,255,255,0.85); max-width: 560px; position: relative; z-index: 1; font-weight: 300; white-space: pre-wrap;}
@@ -222,21 +222,9 @@
     border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
   }
 
-  /* ================= 보고서 데이터 보정(편집) 모드 스타일 ================= */
-  .edit-mode .editable-field {
-    border: 1px dashed var(--teal);
-    background: rgba(10, 122, 110, 0.08) !important;
-    border-radius: 4px;
-    cursor: text;
-    padding: 2px 4px;
-  }
-  .edit-mode .editable-field:focus {
-    outline: 2px solid var(--teal);
-    background: #fff !important;
-  }
-
-  .footer-box { text-align: center; padding: 24px 16px; font-size: 12px; color: #6c757d; margin-top: 40px; border-top: 1px solid var(--border); }
+  .footer-box { text-align: center; padding: 24px 16px; font-size: 12px; color: #6c757d; margin-top: 40px; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .footer-box a { color: #6c757d; text-decoration: none; font-weight: bold; }
+  .print-footer-logo { display: none; }
   
   #loadingOverlay {
     display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -254,8 +242,7 @@
     .hero h1 { color: black !important; text-align: center; margin-bottom: 8px;}
     .hero p { color: black !important; text-align: center; max-width: 100%; margin-bottom: 0;}
     .hero::before, .hero::after { display: none !important; }
-    .logo-container { position: static !important; text-align: center; margin-bottom: 16px; }
-    .logo-container img { filter: none !important; max-height: 40px;}
+    .logo-container { display: none !important; }
     .main { max-width: 100% !important; padding: 0 20px !important; }
     
     .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 20px 0 10px 0 !important; }
@@ -267,7 +254,10 @@
     .dist-bar-fill { background: #555 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     
     .feedback-item { border-left-color: #555 !important; background: #fff !important; border: 1px solid #ddd !important; margin-bottom: 12px;}
-    .footer-box { margin-top: 30px; border-top: 1px solid #000; padding: 10px 0; font-size: 11px; text-align: center; color: #000 !important; display: block !important;}
+    
+    .footer-box { margin-top: 30px; border-top: 1px solid #000; padding: 15px 0 10px 0; font-size: 11px; display: flex !important; flex-direction: row; justify-content: space-between; align-items: flex-end; color: #555 !important; text-align: left; }
+    .footer-box a { display: none !important; }
+    .print-footer-logo { display: block !important; max-height: 18px !important; filter: grayscale(100%); opacity: 0.8; }
     
     /* 인쇄 시 수정용 테두리 완벽 제거 */
     .editable-field { border: none !important; background: transparent !important; padding: 0 !important; }
@@ -368,8 +358,11 @@
   </div>
 
   <div class="footer-box">
-    [System Powered by TOURMAKER] 본 설문조사는 참여 기관의 기획과 투어메이커의 트래블 테크 기술 제휴로 제작되었습니다.<br>
-    <a href="https://tourmaker.kr" target="_blank">투어메이커 바로가기</a>
+    <div class="footer-text">
+      [System Powered by TOURMAKER] 본 설문조사는 참여 기관의 기획과 투어메이커의 트래블 테크 기술 제휴로 제작되었습니다.<br>
+      <a href="https://tourmaker.kr" target="_blank">투어메이커 바로가기</a>
+    </div>
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="투어메이커 로고" class="print-footer-logo">
   </div>
 </div>
 
