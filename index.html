@@ -99,7 +99,7 @@
   .hero h1 { font-size: clamp(24px, 5vw, 32px); font-weight: 700; margin-bottom: 12px; position: relative; z-index: 1; letter-spacing: -0.5px; }
   .hero p { font-size: 15px; color: rgba(255,255,255,0.85); max-width: 560px; position: relative; z-index: 1; font-weight: 300; white-space: pre-wrap; }
 
-  .main { max-width: 760px; margin: 0 auto; padding: 0 16px 80px; }
+  .main { max-width: 800px; margin: 0 auto; padding: 0 16px 80px; }
 
   .view-section { display: none; animation: fadeIn 0.3s ease; }
   .view-section.active { display: block; }
@@ -170,6 +170,7 @@
   .q-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 16px; white-space: pre-wrap; }
   .q-required { color: #E24B4A; margin-left: 3px; font-weight: bold; }
 
+  /* 고객 편의를 위해 UI는 5점 척도로 롤백 */
   .scale-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
   .scale-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--slate); margin: 0 5px 8px 0; font-weight: 500; }
   .scale-option label {
@@ -199,7 +200,7 @@
   }
   .primary-btn:hover { background: var(--navy); }
 
-  /* ================= 3. 보고서 대시보드 전용 ================= */
+  /* ================= 3. 보고서 대시보드 전용 (2단 레이아웃) ================= */
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
   .stat-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; text-align: center; }
   .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 600; }
@@ -211,22 +212,23 @@
   #dOtherStatsContainer .section-card { margin-top: 0; margin-bottom: 0; height: 100%; display: flex; flex-direction: column; }
 
   .report-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); page-break-inside: avoid; break-inside: avoid; height: 100%; display: flex; flex-direction: column; }
-  .report-q-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 20px; line-height: 1.5; }
+  .report-q-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 16px; line-height: 1.4; }
   .report-body { display: flex; gap: 16px; align-items: center; flex-grow: 1; }
 
-  .report-avg { flex-shrink: 0; width: 100px; text-align: center; background: var(--teal-light); padding: 20px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1); }
-  .report-avg .num { font-size: 30px; font-weight: 800; color: var(--teal); line-height: 1; display: inline-block; min-width: 50px; }
-  .report-avg .txt { font-size: 13px; color: var(--navy); margin-top: 8px; font-weight: 600; }
+  .report-avg { flex-shrink: 0; width: 100px; text-align: center; background: var(--teal-light); padding: 18px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1); }
+  .report-avg .num { font-size: 28px; font-weight: 800; color: var(--teal); line-height: 1; display: inline-block; min-width: 50px; }
+  .report-avg .txt { font-size: 12px; color: var(--navy); margin-top: 8px; font-weight: 600; }
 
-  .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
-  .dist-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
-  .dist-label { width: 36px; color: var(--slate); font-weight: 600; text-align: right; }
-  .dist-bar-bg { flex-grow: 1; height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
-  .dist-bar-fill { height: 100%; background: var(--teal-mid); border-radius: 6px; transition: width 0.4s ease-out; }
-  .dist-pct { width: 45px; text-align: right; font-weight: 700; color: var(--navy); display: inline-block; min-width: 30px; }
+  /* 5개 막대그래프로 최적화된 간격 */
+  .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; } 
+  .dist-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .dist-label { width: 30px; color: var(--slate); font-weight: 600; text-align: right; }
+  .dist-bar-bg { flex-grow: 1; height: 10px; background: var(--bg); border-radius: 5px; overflow: hidden; }
+  .dist-bar-fill { height: 100%; background: var(--teal-mid); border-radius: 5px; transition: width 0.4s ease-out; }
+  .dist-pct { width: 40px; text-align: right; font-weight: 700; color: var(--navy); display: inline-block; min-width: 30px; }
 
   .feedback-list { display: flex; flex-direction: column; gap: 12px; }
-  .feedback-item { background: var(--bg); border-left: 4px solid var(--teal); padding: 16px; border-radius: 4px; font-size: 14px; page-break-inside: avoid; }
+  .feedback-item { background: var(--bg); border-left: 4px solid var(--teal); padding: 16px; border-radius: 4px; font-size: 14px; page-break-inside: avoid; break-inside: avoid;}
   .feedback-meta { font-size: 12px; color: var(--slate); margin-bottom: 8px; font-weight: 600; display: flex; justify-content: space-between; }
   .feedback-q { font-weight: 700; color: var(--navy); margin-top: 8px; margin-bottom: 4px; font-size: 13px; }
 
@@ -269,7 +271,7 @@
     background: #fff !important;
   }
 
-  /* ================= 커스텀 팝업 (Toast) 및 애니메이션 ================= */
+  /* ================= 커스텀 팝업 (Toast) ================= */
   #toastBox {
     position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
     background: rgba(26, 58, 92, 0.95); color: white; padding: 14px 24px;
@@ -299,48 +301,65 @@
   .spinner { width: 40px; height: 40px; border: 4px solid var(--teal-light); border-top: 4px solid var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  /* ================= 인쇄(PDF) 최적화 ================= */
+  /* ================= 인쇄(PDF) 2단 레이아웃 완벽 최적화 ================= */
   @media print {
-    body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; word-break: keep-all; }
+    @page { size: A4 portrait; margin: 15mm 10mm; } /* A4 규격 및 여백 최소화 */
+    body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; word-break: keep-all; font-size: 11pt; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } /* 색상 강제 인쇄 */
+
     .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode, #toastBox { display: none !important; }
-    .hero { background: white !important; color: black !important; padding: 20px 0 !important; border-bottom: 2px solid var(--navy); }
-    .hero h1 { color: black !important; text-align: center; margin-bottom: 8px; }
-    .hero p { color: black !important; text-align: center; max-width: 100%; margin-bottom: 0; }
+    .hero { background: white !important; color: black !important; padding: 15px 0 !important; border-bottom: 2px solid var(--navy); }
+    .hero h1 { color: black !important; text-align: center; margin-bottom: 8px; font-size: 24px !important; }
+    .hero p { color: black !important; text-align: center; max-width: 100%; margin-bottom: 0; font-size: 12px !important; }
     .hero::before, .hero::after { display: none !important; }
     .logo-container { display: none !important; }
-    .main { max-width: 100% !important; padding: 0 20px !important; }
+    .main { max-width: 100% !important; padding: 0 !important; }
     
     /* 2단 그리드 강제 유지 및 여백 축소 */
-    #dDetailedStatsContainer, #dOtherStatsContainer { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
-    #dOtherStatsContainer { margin-top: 12px !important; }
+    #dDetailedStatsContainer, #dOtherStatsContainer { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    #dOtherStatsContainer { margin-top: 10px !important; }
     
-    .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 20px 0 10px 0 !important; }
-    .q-block { border: none !important; box-shadow: none !important; padding: 10px 0 !important; page-break-inside: avoid; }
-    .report-card, #dOtherStatsContainer .section-card { border: 1px solid #ddd !important; box-shadow: none !important; padding: 16px !important; margin-bottom: 0 !important; page-break-inside: avoid !important; break-inside: avoid !important; }
-    .report-avg { border: 1px solid #ddd !important; background: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .dist-bar-bg { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .dist-bar-fill { background: #555 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .feedback-item { border-left-color: #555 !important; background: #fff !important; border: 1px solid #ddd !important; margin-bottom: 12px; }
-    .footer-box { margin-top: 30px; border-top: 1px solid #000; padding: 15px 0 10px 0; font-size: 11px; display: flex !important; flex-direction: row; justify-content: space-between; align-items: flex-end; color: #555 !important; text-align: left; }
+    .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 15px 0 5px 0 !important; }
+    .section-title { font-size: 14pt !important; margin-bottom: 15px !important; padding-bottom: 8px !important; }
+    
+    /* 데이터 박스 인쇄 핏 압축 */
+    .report-card, #dOtherStatsContainer .section-card { 
+        border: 1px solid #ddd !important; box-shadow: none !important; 
+        padding: 12px !important; margin-bottom: 0 !important; 
+        page-break-inside: avoid !important; break-inside: avoid !important; 
+    }
+    .report-q-title { font-size: 11pt !important; margin-bottom: 12px !important; }
+    .report-avg { padding: 12px 6px !important; width: 80px !important; border: 1px solid #ddd !important; background: #fafafa !important; }
+    .report-avg .num { font-size: 24px !important; }
+    .report-avg .txt { font-size: 10px !important; }
+    
+    /* 막대그래프 5개 최적화 */
+    .report-dist { gap: 4px !important; }
+    .dist-row { font-size: 9.5pt !important; gap: 6px !important; }
+    .dist-bar-bg { background: #eee !important; height: 8px !important; }
+    .dist-bar-fill { background: #555 !important; }
+    .dist-label { width: 28px !important; }
+    
+    .feedback-item { border-left-color: #555 !important; background: #fff !important; border: 1px solid #ddd !important; margin-bottom: 8px !important; padding: 10px !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+    .footer-box { margin-top: 20px !important; border-top: 1px solid #000 !important; padding: 10px 0 5px 0 !important; font-size: 9pt !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: flex-end !important; color: #555 !important; text-align: left !important; }
     .footer-box a { display: none !important; }
-    .print-footer-logo { display: block !important; max-height: 18px !important; filter: grayscale(100%); opacity: 0.8; }
+    .print-footer-logo { display: block !important; max-height: 16px !important; filter: grayscale(100%); opacity: 0.8; }
     .editable-field { border: none !important; background: transparent !important; padding: 0 !important; outline: none !important; }
     .edit-mode .editable-field { border: none !important; background: transparent !important; }
-    .timeline-container { display: none !important; } /* 타임라인은 인쇄에서 제외 */
+    .timeline-container { display: none !important; } /* 타임라인은 인쇄 제외 */
   }
 
   @media (max-width: 768px) {
-    :root { --nav-height: 104px; } /* 모바일에서 네비게이션 공간 확보 */
+    :root { --nav-height: 104px; }
     .admin-nav { flex-wrap: wrap; padding: 12px 16px 0; justify-content: space-between; align-items: flex-start; }
     .nav-brand { font-size: 14px; width: calc(100% - 100px); margin-top: 2px; }
     .status-badge { display: inline-block; margin-top: 4px; margin-left: 0; }
     .share-btn { padding: 6px 12px; font-size: 12px; margin-top: 0; }
     
-    /* 모바일에서 관리자 탭 활성화 및 가로 스크롤 적용 */
     .nav-tabs { display: flex; width: 100%; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start; }
     .nav-tab { flex: 1; min-width: max-content; padding: 12px 16px; font-size: 13px; height: auto; border-bottom: 3px solid transparent; }
     
-    /* 모바일은 다시 1단으로 원복 */
+    /* 모바일에서는 1단 배치 */
     #dDetailedStatsContainer, #dOtherStatsContainer { grid-template-columns: 1fr !important; }
     
     .b-row { flex-direction: column; }
@@ -351,11 +370,8 @@
     .section-title { flex-direction: column; align-items: flex-start; gap: 10px;}
     .dist-badge { margin-left: 0; }
 
-    /* 빌더 최상단 '행사 고유 코드' 버튼 모바일 최적화 (가로폭 100% 꽉 차게) */
     .builder-item-fixed > div > div:last-child { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
     .builder-item-fixed .print-btn { width: 100%; justify-content: center; text-align: center; }
-    
-    /* 대시보드 버튼 그룹 모바일 최적화 */
     #viewDashboard > div:first-child > div:nth-child(2) { flex-direction: column; width: 100%; }
     #viewDashboard > div:first-child > div:nth-child(2) button { width: 100%; }
   }
@@ -446,7 +462,7 @@
           <div class="value editable-field" id="dTotalCount">0명</div>
         </div>
         <div class="stat-box">
-          <h4>전체 평균 만족도 (5점 척도 기준)</h4>
+          <h4>전체 평균 만족도 (10점 환산)</h4>
           <div class="value editable-field" id="dTotalAvg">0.0점</div>
         </div>
       </div>
@@ -454,11 +470,11 @@
     </div>
     <div id="dOtherStatsContainer"></div>
     
-    <!-- ★ 신규: 응답 타임라인 (누가 언제 보냈는지 시간순으로 추적) -->
+    <!-- 응답 타임라인 -->
     <div class="section-card">
       <div class="section-title">⏱️ 실시간 응답 타임라인 <span style="font-size:12px; color:var(--slate); font-weight:normal; margin-left:8px;">최근 응답순</span></div>
       <div class="timeline-container" id="dTimelineList">
-        <!-- 타임라인 아이템이 여기에 동적으로 추가됩니다 -->
+        <!-- 타임라인 동적 추가 -->
       </div>
     </div>
 
@@ -497,9 +513,6 @@
   import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  /* =========================================================
-     팝업 (Toast) 알림
-  ========================================================= */
   let toastTimeout;
   window.showToast = function(msg) {
     const toast = document.getElementById('toastBox');
@@ -509,9 +522,6 @@
     toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
   };
 
-  /* =========================================================
-     유틸: textarea 자동 높이 조절
-  ========================================================= */
   function adjustHeight(el) {
     el.style.height = 'auto';
     el.style.height = el.scrollHeight + 'px';
@@ -523,14 +533,12 @@
     }
   });
 
-  /* =========================================================
-     URL 파라미터 & 초기 상태
-  ========================================================= */
   const urlParams = new URLSearchParams(window.location.search);
   const isCustomerMode = urlParams.get('mode') === 'view';
 
   let currentEventId = urlParams.get('eventId') || '260512_Osaka';
 
+  // 기본 문항 5점 척도로 구성
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
@@ -548,7 +556,7 @@
       { id: "q_fb",      type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점이나 아쉬웠던 점을 자유롭게 적어주세요.",                       required: false },
       { id: "q_idea",    type: "textarea", title: "[제안사항] 향후 기획될 행사에 적용해보고 싶은 새로운 아이디어나 제안 사항이 있다면 공유해주세요.",          required: false }
     ],
-    lastDistributedAt: null // 배포 시점 기록용
+    lastDistributedAt: null
   };
 
   const uiHeroTitle = document.getElementById('uiHeroTitle');
@@ -582,13 +590,9 @@
     if (targetId === 'viewDashboard') fetchAndRenderDashboard();
   }
 
-  /* =========================================================
-     Firebase 초기화 및 DB 접속
-  ========================================================= */
   let app, auth, db;
   const appId = typeof __app_id !== 'undefined' ? __app_id : 'tourmaker-survey-gform';
 
-  // ★ 대표님의 실제 프로젝트 정보가 괄호 { } 안에 올바르게 포함된 최종 버전입니다!
   const MY_FIREBASE_CONFIG = {
     apiKey: "AIzaSyCbWUfIHMqyVDrTt6o8h6PwDYcr5emJC1o",
     authDomain: "tourmaker-survey.firebaseapp.com",
@@ -645,7 +649,6 @@
   const initAuth = async () => {
     try {
       if (MY_FIREBASE_CONFIG) {
-        // ★ 대표님의 개인 Firebase 사용 시, 환경 충돌을 막기 위해 무조건 익명 로그인 사용
         await signInAnonymously(auth);
       } else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
         await signInWithCustomToken(auth, __initial_auth_token);
@@ -699,7 +702,7 @@
       if (!isLocalMode && db && auth && auth.currentUser) {
         const docSnap = await getDoc(getConfigDocRef(currentEventId));
         if (docSnap.exists()) {
-          currentConfig = Object.assign(currentConfig, docSnap.data()); // 기존 값과 병합
+          currentConfig = Object.assign(currentConfig, docSnap.data());
           return;
         }
       }
@@ -727,9 +730,6 @@
     showToast(`[${currentEventId}] 행사 환경을 성공적으로 불러왔습니다.`);
   };
 
-  /* =========================================================
-     배포 링크 복사 및 시간 기록
-  ========================================================= */
   window.copyShareLink = async function() {
     const inputCode = document.getElementById('bEventId').value.trim();
     if (!inputCode) {
@@ -764,7 +764,6 @@
       console.warn("단축 URL 생성 실패, 원본 URL 사용:", e);
     }
 
-    // ★ 배포 시간 기록 (Background 업데이트)
     const nowISO = new Date().toISOString();
     currentConfig.lastDistributedAt = nowISO;
     try {
@@ -773,7 +772,6 @@
       } else {
         localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
       }
-      // UI 즉각 반영 (만약 대시보드 화면이라면)
       const dTimeStr = new Date(nowISO).toLocaleString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
       document.getElementById('dDistBadge').innerText = `최근 배포: ${dTimeStr}`;
     } catch (err) { console.warn('배포 시간 기록 실패:', err); }
@@ -796,9 +794,6 @@
     }
   };
 
-  /* =========================================================
-     빌더 렌더링 및 기능
-  ========================================================= */
   function renderBuilder() {
     document.getElementById('bEventId').value = currentEventId;
     document.getElementById('bTitle').value   = currentConfig.title;
@@ -826,7 +821,7 @@
     card.dataset.id = q.id;
 
     const types = [
-      { val: 'scale',    txt: '5점 척도 (평가용)' },
+      { val: 'scale',    txt: '5점 척도 (평가용)' }, /* 5점 척도로 표기 롤백 */
       { val: 'radio',    txt: '객관식 (단일 선택)' },
       { val: 'text',     txt: '단답형 텍스트' },
       { val: 'textarea', txt: '장문형 텍스트' }
@@ -907,7 +902,7 @@
       title: document.getElementById('bTitle').value.trim(),
       desc:  document.getElementById('bDesc').value.trim(),
       questions: [],
-      lastDistributedAt: currentConfig.lastDistributedAt // 기존 배포시간 유지
+      lastDistributedAt: currentConfig.lastDistributedAt
     };
 
     document.querySelectorAll('#bQuestionList .builder-item:not(.builder-item-fixed)').forEach(card => {
@@ -948,7 +943,7 @@
   };
 
   /* =========================================================
-     폼 렌더링 및 제출
+     ★ 폼 렌더링 (고객 편의를 위해 5점 척도 UI로 롤백)
   ========================================================= */
   function renderForm() {
     const container = document.getElementById('fFormContainer');
@@ -1010,7 +1005,6 @@
   }
 
   window.submitSurvey = async function() {
-    // ★ 고객이 버튼을 누른 정확한 시점을 ISO 문자열로 기록
     const payload = { createdAt: new Date().toISOString() };
     let isValid = true;
     let userName = "";
@@ -1087,9 +1081,6 @@
     }
   };
 
-  /* =========================================================
-     데이터 전체 초기화 로직
-  ========================================================= */
   window.resetSurveyData = async function() {
     if (!confirm(`⚠️ 경고: [${currentEventId}]의 모든 응답 데이터가 삭제됩니다.\n테스트 완료 후 실제 고객에게 배포하기 전에만 사용하세요.\n정말 초기화 하시겠습니까?`)) {
       return;
@@ -1117,10 +1108,6 @@
     showLoading(false);
   };
 
-
-  /* =========================================================
-     데이터 보정 모드 및 인쇄
-  ========================================================= */
   window.isEditMode = false;
   window.toggleEditMode = function() {
     window.isEditMode = !window.isEditMode;
@@ -1166,7 +1153,7 @@
   });
 
   /* =========================================================
-     대시보드 렌더링 (타임라인 포함)
+     ★ 대시보드 렌더링 (DB값은 1~5, 표기는 10점 만점 환산)
   ========================================================= */
   async function fetchAndRenderDashboard() {
     showLoading(true);
@@ -1178,7 +1165,6 @@
       btnEdit.style.background = 'var(--slate)';
     }
 
-    // ★ 배포 시간 UI 업데이트
     const badgeEl = document.getElementById('dDistBadge');
     if (currentConfig.lastDistributedAt) {
       const dTime = new Date(currentConfig.lastDistributedAt).toLocaleString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -1220,27 +1206,20 @@
       return;
     }
 
-    // ================== 실시간 응답 타임라인 생성 ==================
-    // 최신 응답이 위로 오도록 정렬
     const sortedResponses = [...responses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
     sortedResponses.forEach((res, index) => {
       const tDate = new Date(res.createdAt);
-      // 초 단위까지 정밀하게 표기
       const timeStr = tDate.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
       
       let uName = "익명 응답자";
-      // 성명 항목 찾기 로직
       for(let key in res) {
          const qDef = currentConfig.questions.find(q => q.id === key);
          if (qDef && (qDef.id === 'q_name' || qDef.title.includes('성명'))) {
             if (res[key]) uName = res[key];
          }
       }
-
-      // 가장 최근 응답 1개에만 'New' 배지 부착
       const isNew = index === 0 ? '<span class="badge-new">NEW</span>' : '';
-
       timelineList.insertAdjacentHTML('beforeend', `
         <div class="timeline-item">
           <div class="name">👤 ${uName} ${isNew}</div>
@@ -1249,7 +1228,6 @@
       `);
     });
 
-    // ================== 통계 및 그래프 생성 ==================
     const scaleQs = currentConfig.questions.filter(q => q.type === 'scale');
     const radioQs = currentConfig.questions.filter(q => q.type === 'radio');
     const textQs  = currentConfig.questions.filter(q => q.type === 'text' || q.type === 'textarea');
@@ -1260,6 +1238,7 @@
 
       scaleQs.forEach((q, idx) => {
         let sum = 0, validCount = 0;
+        // DB는 5점 척도 기준이므로 5~1 세팅
         const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
 
         responses.forEach(r => {
@@ -1270,6 +1249,7 @@
           }
         });
 
+        // avg는 5점 만점 기준의 평균
         const avg = validCount > 0 ? sum / validCount : 0;
         grandTotalAvg += avg;
 
@@ -1290,8 +1270,9 @@
             <div class="report-q-title">${idx + 1}. ${q.title}</div>
             <div class="report-body">
               <div class="report-avg">
-                <div class="num editable-field" contenteditable="false">${avg.toFixed(1)}</div>
-                <div class="txt">평균 점수</div>
+                <!-- 10점 만점 환산을 위해 x2 배수 처리 -->
+                <div class="num editable-field" contenteditable="false">${(avg * 2).toFixed(1)}</div>
+                <div class="txt">10점 만점 환산</div>
               </div>
               <div class="report-dist">${distRowsHTML}</div>
             </div>
@@ -1299,7 +1280,8 @@
         `;
       });
 
-      document.getElementById('dTotalAvg').innerText = `${(grandTotalAvg / scaleQs.length).toFixed(2)}점`;
+      // 전체 평균 또한 10점 만점으로 스케일업
+      document.getElementById('dTotalAvg').innerText = `${((grandTotalAvg / scaleQs.length) * 2).toFixed(1)}점`;
       detailedContainer.innerHTML = detailedHTML;
     } else {
       document.getElementById('dTotalAvg').innerText = `-`;
@@ -1339,7 +1321,6 @@
       `);
     });
 
-    // 주관식 리스트 (작성 시간 분 단위까지 추가 표기)
     responses.forEach(res => {
       let hasFb = false;
       const writeTime = new Date(res.createdAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
