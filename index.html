@@ -405,7 +405,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
   /* =========================================================
      [신규] 경고창(Alert)을 대체하는 세련된 Toast 알림
@@ -445,18 +445,18 @@
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
     questions: [
-      { id: "q_name",    type: "text",     title: "성명 및 소속 (선택)",                                                                                                                      required: false },
-      { id: "q_contact", type: "text",     title: "연락처 (선택)",                                                                                                                            required: false },
-      { id: "q_prep",    type: "scale",    title: "[사전준비] 안내 자료와 설명회 등 사전 준비 과정은 실질적인 도움이 되었습니까?",                                                             required: true  },
-      { id: "q_sch",     type: "scale",    title: "[일정구성] 방문지 구성과 체류 시간 등 전체적인 일정은 유익하고 적절했습니까?",                                                             required: true  },
-      { id: "q_op",      type: "scale",    title: "[콘텐츠·운영] 프로그램 내용과 행사 현장에서의 세심한 배려(운영)에 만족하십니까?",                                                         required: true  },
-      { id: "q_hotel",   type: "scale",    title: "[숙박] 이용하신 숙소는 청결하고 편안하게 휴식하기 좋았습니까?",                                                                           required: true  },
-      { id: "q_meal",    type: "scale",    title: "[식사] 제공된 식사는 현지의 특색을 느낄 수 있고 입맛에 맞았습니까?",                                                                      required: true  },
-      { id: "q_trans",   type: "scale",    title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?",                                                                           required: true  },
-      { id: "q_guide",   type: "scale",    title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?",                                                     required: true  },
-      { id: "q_total",   type: "scale",    title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?",                                                                           required: true  },
-      { id: "q_fb",      type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점이나 아쉬웠던 점을 자유롭게 적어주세요.",                                                     required: false },
-      { id: "q_idea",    type: "textarea", title: "[제안사항] 향후 기획될 행사에 적용해보고 싶은 새로운 아이디어나 제안 사항이 있다면 공유해주세요.",                                         required: false }
+      { id: "q_name",    type: "text",     title: "성명 및 소속 (선택)",                                                               required: false },
+      { id: "q_contact", type: "text",     title: "연락처 (선택)",                                                                     required: false },
+      { id: "q_prep",    type: "scale",    title: "[사전준비] 안내 자료와 설명회 등 사전 준비 과정은 실질적인 도움이 되었습니까?",                      required: true  },
+      { id: "q_sch",     type: "scale",    title: "[일정구성] 방문지 구성과 체류 시간 등 전체적인 일정은 유익하고 적절했습니까?",                      required: true  },
+      { id: "q_op",      type: "scale",    title: "[콘텐츠·운영] 프로그램 내용과 행사 현장에서의 세심한 배려(운영)에 만족하십니까?",                    required: true  },
+      { id: "q_hotel",   type: "scale",    title: "[숙박] 이용하신 숙소는 청결하고 편안하게 휴식하기 좋았습니까?",                                       required: true  },
+      { id: "q_meal",    type: "scale",    title: "[식사] 제공된 식사는 현지의 특색을 느낄 수 있고 입맛에 맞았습니까?",                                   required: true  },
+      { id: "q_trans",   type: "scale",    title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?",                                       required: true  },
+      { id: "q_guide",   type: "scale",    title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?",                      required: true  },
+      { id: "q_total",   type: "scale",    title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?",                                       required: true  },
+      { id: "q_fb",      type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점이나 아쉬웠던 점을 자유롭게 적어주세요.",                      required: false },
+      { id: "q_idea",    type: "textarea", title: "[제안사항] 향후 기획될 행사에 적용해보고 싶은 새로운 아이디어나 제안 사항이 있다면 공유해주세요.",          required: false }
     ]
   };
 
@@ -537,18 +537,39 @@
   };
 
   /* =========================================================
-     Firebase 초기화 및 DB 접속
+     Firebase 초기화 및 DB 접속 (경로 오류/배포 환경 수정)
   ========================================================= */
   let app, auth, db;
   const appId = typeof __app_id !== 'undefined' ? __app_id : 'tourmaker-survey-gform';
 
+  // ★ 중요: Github Pages(indadady.github.io) 등 외부에 배포하실 때는 
+  // 아래 null 자리에 대표님의 실제 Firebase Config 객체를 붙여넣으셔야 합니다.
+  // (현재는 Canvas 환경 변수 우선, 없으면 에러 방지용 로컬모드로 동작합니다)
+  const MY_FIREBASE_CONFIG = null; 
+  /* 예시:
+  const MY_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyB...",
+    authDomain: "tourmaker-....firebaseapp.com",
+    projectId: "tourmaker-...",
+    ...
+  };
+  */
+
   try {
-    const firebaseConfig = typeof __firebase_config !== 'undefined'
-      ? JSON.parse(__firebase_config)
-      : { projectId: "demo" };
-    app  = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db   = getFirestore(app);
+    let configToUse = null;
+    if (MY_FIREBASE_CONFIG) {
+      configToUse = MY_FIREBASE_CONFIG;
+    } else if (typeof __firebase_config !== 'undefined') {
+      configToUse = JSON.parse(__firebase_config);
+    }
+
+    if (configToUse) {
+      app  = initializeApp(configToUse);
+      auth = getAuth(app);
+      db   = getFirestore(app);
+    } else {
+      console.warn("Firebase 설정이 없어 오프라인(Local Storage) 모드로 동작합니다.");
+    }
   } catch (error) { console.error("Firebase Init Error:", error); }
 
   function showLoading(show) { loadingOverlay.style.display = show ? 'flex' : 'none'; }
@@ -583,21 +604,22 @@
     });
   }
 
-  // [수정] 투어메이커 표준 규칙 엄수 (artifacts/{appId}/public/data/{collectionName})
+  // [수정완료] 투어메이커 표준 규칙에 맞게 경로 뎁스(Depth) 보정
+  // doc()은 짝수, collection()은 홀수 개의 뎁스를 가져야 합니다.
   function getConfigDocRef(eventId) {
-    return doc(db, 'artifacts', appId, 'public', 'data', 'settings_' + eventId);
+    // 6 segments: artifacts -> appId -> public -> data -> config -> eventId (문서)
+    return doc(db, 'artifacts', appId, 'public', 'data', 'config', eventId);
   }
   function getResponsesColRef(eventId) {
+    // 5 segments: artifacts -> appId -> public -> data -> responses_... (컬렉션)
     return collection(db, 'artifacts', appId, 'public', 'data', 'responses_' + eventId);
   }
 
   async function loadConfigFromDB() {
     try {
-      if (db && typeof __firebase_config !== 'undefined') {
-        const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data'));
-        // 컬렉션 전체에서 현재 ID에 해당하는 문서를 필터링 (Firestore 단순화)
-        const docSnap = snap.docs.find(d => d.id === 'settings_' + currentEventId);
-        if (docSnap) {
+      if (db && auth && auth.currentUser) {
+        const docSnap = await getDoc(getConfigDocRef(currentEventId));
+        if (docSnap.exists()) {
           currentConfig = docSnap.data();
           return;
         }
@@ -763,10 +785,10 @@
     uiHeroDesc.innerText  = currentConfig.desc;
 
     try {
-      if (db && typeof __firebase_config !== 'undefined') {
+      if (db && auth && auth.currentUser) {
         await setDoc(getConfigDocRef(currentEventId), currentConfig);
       } else {
-        throw new Error("Local Environment");
+        throw new Error("DB 연결 없음 (Local Environment)");
       }
     } catch (e) {
       localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
@@ -864,7 +886,7 @@
       } else {
         block.style.border = '';
         block.style.borderRadius = '';
-        // 비필수 빈 값도 명확하게 null 처리 (undefined 오류 방지)
+        // 비필수 빈 값도 명확하게 null 처리
         payload[id] = (val === '' || val === null) ? null : val;
       }
     });
@@ -878,10 +900,10 @@
 
     showLoading(true);
     try {
-      if (db && typeof __firebase_config !== 'undefined') {
+      if (db && auth && auth.currentUser) {
         await addDoc(getResponsesColRef(currentEventId), payload);
       } else {
-        throw new Error("Local Environment");
+        throw new Error("DB 연결 없음 (Local Environment)");
       }
     } catch (e) {
       const localData = JSON.parse(localStorage.getItem(`tm_survey_responses_${currentEventId}`) || '[]');
@@ -957,12 +979,12 @@
 
     let responses = [];
     try {
-      if (db && typeof __firebase_config !== 'undefined') {
-        // [FIX] 올바른 컬렉션 경로를 통해 응답 불러오기
+      if (db && auth && auth.currentUser) {
+        // [수정완료] 정상적인 컬렉션 경로를 통해 데이터 호출
         const snap = await getDocs(getResponsesColRef(currentEventId));
         snap.forEach(d => responses.push(d.data()));
       } else {
-        throw new Error("Local Environment");
+        throw new Error("DB 연결 없음 (Local Environment)");
       }
     } catch (e) {
       responses = JSON.parse(localStorage.getItem(`tm_survey_responses_${currentEventId}`) || '[]');
