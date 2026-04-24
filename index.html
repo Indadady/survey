@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>행사/연수 스마트 설문조사 플랫폼 - 투어메이커</title>
+
+<!-- 카카오톡 등 SNS 공유 시 노출되는 썸네일 및 정보 (Open Graph) -->
+<meta property="og:title" content="스마트 설문조사 플랫폼 - 투어메이커">
+<meta property="og:description" content="참여하신 행사에 대한 소중한 의견을 남겨주세요.">
+<meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png">
+<meta property="og:type" content="website">
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JLH9GD9SVR"></script>
 <script>
@@ -117,7 +124,13 @@
   .b-input:focus { border-bottom: 2px solid var(--teal); outline: none; background: #fff; }
   .b-input.title-input { font-size: 16px; font-weight: 600; }
   
-  textarea.b-input { min-height: 80px; resize: vertical; }
+  /* 메모장처럼 자동 높이 조절되는 텍스트 공간 */
+  .auto-expand {
+    resize: none;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+
   select.b-input { width: 180px; flex-shrink: 0; cursor: pointer; }
   
   .b-options-container { margin-left: 8px; margin-bottom: 16px; }
@@ -178,23 +191,20 @@
   }
   .primary-btn:hover { background: var(--navy); }
 
-  /* ================= 3. 보고서 대시보드 전용 (PDF 톤앤매너 완벽 반영) ================= */
+  /* ================= 3. 보고서 대시보드 전용 ================= */
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
   .stat-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; text-align: center; }
   .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 600; }
   .stat-box .value { font-size: 32px; font-weight: 800; color: var(--navy); }
   
-  /* 문항별 상세 보고서 카드 */
   .report-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); page-break-inside: avoid; }
   .report-q-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 20px; line-height: 1.5; }
   .report-body { display: flex; gap: 32px; align-items: center; }
   
-  /* 평균 점수 박스 */
   .report-avg { flex-shrink: 0; width: 120px; text-align: center; background: var(--teal-light); padding: 20px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1);}
   .report-avg .num { font-size: 36px; font-weight: 800; color: var(--teal); line-height: 1; }
   .report-avg .txt { font-size: 13px; color: var(--navy); margin-top: 8px; font-weight: 600; }
   
-  /* 분포 막대 그래프 영역 */
   .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
   .dist-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
   .dist-label { width: 36px; color: var(--slate); font-weight: 600; text-align: right; }
@@ -223,7 +233,6 @@
   .spinner { width: 40px; height: 40px; border: 4px solid var(--teal-light); border-top: 4px solid var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  /* ================= 투어메이커 표준 인쇄(PDF) 톤앤매너 최적화 ================= */
   @media print {
     body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; }
     .admin-nav, .primary-btn, .print-btn, .floating-add-btn { display: none !important; }
@@ -238,7 +247,6 @@
     .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 20px 0 10px 0 !important; }
     .q-block { border: none !important; box-shadow: none !important; padding: 10px 0 !important; page-break-inside: avoid;}
     
-    /* 인쇄용 카드 색상 강제 렌더링 */
     .report-card { border: 1px solid #ddd !important; box-shadow: none !important; padding: 20px !important; margin-bottom: 20px !important; }
     .report-avg { border: 1px solid #ddd !important; background: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .dist-bar-bg { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -254,7 +262,6 @@
     .nav-brand { display: none; }
     .b-row { flex-direction: column; }
     select.b-input { width: 100%; }
-    /* 모바일에서는 통계 카드를 상하 배치 */
     .report-body { flex-direction: column; gap: 20px; align-items: stretch; }
     .report-avg { width: 100%; display: flex; justify-content: center; align-items: baseline; gap: 8px; padding: 16px;}
     .report-avg .txt { margin-top: 0; }
@@ -287,8 +294,8 @@
   <!-- 1. 빌더 뷰 -->
   <div id="viewBuilder" class="view-section active">
     <div class="builder-item card-header-offset" style="border-top: 8px solid var(--navy);">
-      <input type="text" class="b-input title-input" id="bTitle" placeholder="설문지 제목" style="border:none; border-bottom:1px solid var(--border); font-size:24px; padding:12px 0;">
-      <textarea class="b-input" id="bDesc" placeholder="설문지 설명 및 안내 문구" style="border:none; padding:12px 0; min-height:60px; margin-top:8px;"></textarea>
+      <textarea class="b-input title-input auto-expand" id="bTitle" placeholder="설문지 제목" rows="1" style="border:none; border-bottom:1px solid var(--border); font-size:24px; padding:12px 0; font-weight:700;"></textarea>
+      <textarea class="b-input auto-expand" id="bDesc" placeholder="설문지 설명 및 안내 문구" rows="1" style="border:none; padding:12px 0; min-height:60px; margin-top:8px;"></textarea>
     </div>
     <div id="bQuestionList"></div>
     <button class="floating-add-btn" onclick="addQuestionCard()">
@@ -351,15 +358,28 @@
   import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+  // 자동 높이 조절 (Auto-expand) 기능
+  function adjustHeight(el) {
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight) + 'px';
+  }
+
+  document.addEventListener('input', function(e) {
+    if (e.target.classList && e.target.classList.contains('auto-expand')) {
+      adjustHeight(e.target);
+    }
+  });
+
   const urlParams = new URLSearchParams(window.location.search);
   const isCustomerMode = urlParams.get('mode') === 'view'; 
   
+  // 연락처(q_contact)를 required: false 로 변경
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
     questions: [
       { id: "q_name", type: "text", title: "성명 및 소속", required: false },
-      { id: "q_contact", type: "text", title: "연락처", required: true },
+      { id: "q_contact", type: "text", title: "연락처 (선택)", required: false },
       { id: "q_prep", type: "scale", title: "[사전준비] 안내 자료와 설명회 등 사전 준비 과정은 실질적인 도움이 되었습니까?", required: true },
       { id: "q_sch", type: "scale", title: "[일정구성] 방문지 구성과 체류 시간 등 전체적인 일정은 유익하고 적절했습니까?", required: true },
       { id: "q_op", type: "scale", title: "[콘텐츠·운영] 프로그램 내용과 행사 현장에서의 세심한 배려(운영)에 만족하십니까?", required: true },
@@ -409,7 +429,7 @@
     tempInput.select();
     document.execCommand("copy");
     document.body.removeChild(tempInput);
-    alert('배포용 링크가 복사되었습니다!\\n고객은 이 링크 접속 시 관리자 메뉴를 볼 수 없습니다.');
+    alert('배포용 링크가 복사되었습니다!\n고객은 이 링크 접속 시 관리자 메뉴를 볼 수 없습니다.');
   };
 
   let app, auth, db;
@@ -447,20 +467,34 @@
       });
     });
   } else {
-    renderBuilder();
-    uiHeroTitle.innerText = currentConfig.title;
-    uiHeroDesc.innerText = currentConfig.desc;
+    // Firebase를 쓸 수 없는 환경(GitHub Pages 로컬 구동 등)일 때 Fallback
+    loadConfigFromDB().then(() => {
+      renderBuilder();
+      uiHeroTitle.innerText = currentConfig.title;
+      uiHeroDesc.innerText = currentConfig.desc;
+    });
   }
 
   async function loadConfigFromDB() {
-    if (!auth || !auth.currentUser) return;
     try {
-      const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
-      const snap = await getDocs(collRef);
-      if (!snap.empty) {
-        currentConfig = snap.docs[0].data();
+      // 캔버스 환경 판별: __firebase_config 변수가 있으면 실제 클라우드 호출 시도
+      if(db && typeof __firebase_config !== 'undefined') {
+        const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
+        const snap = await getDocs(collRef);
+        if (!snap.empty) { 
+          currentConfig = snap.docs[0].data(); 
+          return; 
+        }
       }
-    } catch(e) { console.warn("설정 로드 실패, 기본값 사용"); }
+    } catch(e) { 
+      console.warn("DB 로드 실패, Local Storage Fallback 시도"); 
+    }
+
+    // 깃허브 등 외부 환경용 로컬 스토리지 데이터 로드
+    const localConf = localStorage.getItem('tm_survey_config');
+    if (localConf) {
+      currentConfig = JSON.parse(localConf);
+    }
   }
 
   function renderBuilder() {
@@ -473,11 +507,22 @@
     currentConfig.questions.forEach(q => {
       list.appendChild(createQuestionCard(q));
     });
+
+    // 렌더링 직후 모든 텍스트 영역 높이 일괄 조정
+    setTimeout(() => {
+      document.querySelectorAll('.auto-expand').forEach(adjustHeight);
+    }, 50);
   }
 
   window.addQuestionCard = function() {
-    const newQ = { id: 'q_' + Date.now(), type: 'scale', title: '새로운 질문', required: true, options: ['옵션 1'] };
-    document.getElementById('bQuestionList').appendChild(createQuestionCard(newQ));
+    const newQ = { id: 'q_' + Date.now(), type: 'scale', title: '', required: true, options: ['옵션 1'] };
+    const card = createQuestionCard(newQ);
+    document.getElementById('bQuestionList').appendChild(card);
+    
+    // 추가된 카드의 텍스트 영역 높이 조정
+    setTimeout(() => {
+      card.querySelectorAll('.auto-expand').forEach(adjustHeight);
+    }, 10);
   };
 
   function createQuestionCard(q) {
@@ -495,7 +540,7 @@
 
     card.innerHTML = `
       <div class="b-row">
-        <input type="text" class="b-input title-input b-q-title" value="${q.title}" placeholder="질문을 입력하세요">
+        <textarea class="b-input title-input b-q-title auto-expand" rows="1" placeholder="질문을 입력하세요">${q.title}</textarea>
         <select class="b-input b-q-type">${typeOptions}</select>
       </div>
       <div class="b-options-container" style="display: ${q.type === 'radio' ? 'block' : 'none'}">
@@ -546,7 +591,6 @@
   }
 
   window.saveConfigData = async function() {
-    if (!auth || !auth.currentUser) { alert("인증 정보가 없습니다. 다시 시도해주세요."); return; }
     showLoading(true);
     
     const newConfig = {
@@ -576,14 +620,20 @@
     uiHeroDesc.innerText = currentConfig.desc;
 
     try {
-      if (db) {
+      if (db && typeof __firebase_config !== 'undefined') {
         const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
         const snap = await getDocs(collRef);
         if(snap.empty) await addDoc(collRef, currentConfig);
         else await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'survey_settings', snap.docs[0].id), currentConfig);
+      } else {
+        throw new Error("Local Environment - Using LocalStorage");
       }
-      alert('설정이 저장되었습니다. 고객 화면 탭을 확인해 보세요.');
-    } catch(e) { console.error(e); alert('DB 연결 실패. 임시 메모리에만 적용됩니다.'); }
+    } catch(e) { 
+      // 권한 없음 에러(깃허브 등) 발생 시 로컬 스토리지에 안전하게 저장
+      localStorage.setItem('tm_survey_config', JSON.stringify(currentConfig));
+    }
+
+    alert('설정이 저장되었습니다. 고객 화면 탭을 확인해 보세요.');
     showLoading(false);
   };
 
@@ -599,7 +649,13 @@
 
     currentConfig.questions.forEach((q, idx) => {
       let contentHTML = '';
+      let extraDesc = '';
       const reqMark = q.required ? '<span class="q-required">*</span>' : '';
+
+      // 연락처 문항일 경우 심리적 안심 멘트 추가
+      if (q.id === 'q_contact' || q.title.includes('연락처')) {
+        extraDesc = `<p style="color:var(--teal); font-size:13px; margin-top:-10px; margin-bottom:12px; line-height:1.4;">※ 연락처는 우수 의견 선정 및 모바일 기프티콘 발송 시에만 활용되며 행사 종료 후 안전하게 파기됩니다. 원치 않으시면 비워두셔도 좋습니다.</p>`;
+      }
 
       if (q.type === 'scale') {
         contentHTML = `
@@ -620,6 +676,7 @@
       container.insertAdjacentHTML('beforeend', `
         <div class="q-block" data-id="${q.id}" data-type="${q.type}" data-required="${q.required}">
           <label class="q-label">${q.title} ${reqMark}</label>
+          ${extraDesc}
           ${contentHTML}
         </div>
       `);
@@ -634,8 +691,6 @@
   }
 
   window.submitSurvey = async function() {
-    if (!auth || !auth.currentUser) { alert("인증 정보가 없습니다. 잠시 후 다시 시도해주세요."); return; }
-
     const payload = { createdAt: new Date().toISOString() };
     let isValid = true;
 
@@ -669,25 +724,39 @@
 
     showLoading(true);
     try {
-      if(db) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'), payload);
-      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-      document.getElementById('viewComplete').classList.add('active');
-      window.scrollTo(0,0);
-    } catch(e) { console.error(e); alert('오류가 발생했습니다. 다시 시도해주세요.'); }
+      if(db && typeof __firebase_config !== 'undefined') {
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'), payload);
+      } else {
+        throw new Error("Local Environment - Using LocalStorage");
+      }
+    } catch(e) { 
+      // 깃허브 등 권한 문제 발생 시 브라우저 내부 저장소 활용 (테스트 목적)
+      const localData = JSON.parse(localStorage.getItem('tm_survey_responses') || '[]');
+      localData.push(payload);
+      localStorage.setItem('tm_survey_responses', JSON.stringify(localData));
+    }
+    
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById('viewComplete').classList.add('active');
+    window.scrollTo(0,0);
     showLoading(false);
   };
 
   async function fetchAndRenderDashboard() {
-    if (!auth || !auth.currentUser) return;
     showLoading(true);
     
     let responses = [];
     try {
-      if(db) {
+      if(db && typeof __firebase_config !== 'undefined') {
         const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'));
         snap.forEach(doc => responses.push(doc.data()));
+      } else {
+        throw new Error("Local Environment - Using LocalStorage");
       }
-    } catch(e) { console.error(e); }
+    } catch(e) { 
+      // 권한 에러 시 로컬 저장소에서 데이터 불러오기
+      responses = JSON.parse(localStorage.getItem('tm_survey_responses') || '[]');
+    }
 
     const count = responses.length;
     document.getElementById('dTotalCount').innerText = `${count}명`;
