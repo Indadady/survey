@@ -205,12 +205,17 @@
   .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 600; }
   .stat-box .value { font-size: 32px; font-weight: 800; color: var(--navy); }
 
-  .report-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); page-break-inside: avoid; }
-  .report-q-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 20px; line-height: 1.5; }
-  .report-body { display: flex; gap: 32px; align-items: center; }
+  /* 2단 그리드 레이아웃 적용 */
+  #dDetailedStatsContainer, #dOtherStatsContainer { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  #dOtherStatsContainer { margin-top: 16px; }
+  #dOtherStatsContainer .section-card { margin-top: 0; margin-bottom: 0; height: 100%; display: flex; flex-direction: column; }
 
-  .report-avg { flex-shrink: 0; width: 120px; text-align: center; background: var(--teal-light); padding: 20px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1); }
-  .report-avg .num { font-size: 36px; font-weight: 800; color: var(--teal); line-height: 1; display: inline-block; min-width: 60px; }
+  .report-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); page-break-inside: avoid; break-inside: avoid; height: 100%; display: flex; flex-direction: column; }
+  .report-q-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 20px; line-height: 1.5; }
+  .report-body { display: flex; gap: 16px; align-items: center; flex-grow: 1; }
+
+  .report-avg { flex-shrink: 0; width: 100px; text-align: center; background: var(--teal-light); padding: 20px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1); }
+  .report-avg .num { font-size: 30px; font-weight: 800; color: var(--teal); line-height: 1; display: inline-block; min-width: 50px; }
   .report-avg .txt { font-size: 13px; color: var(--navy); margin-top: 8px; font-weight: 600; }
 
   .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
@@ -296,7 +301,7 @@
 
   /* ================= 인쇄(PDF) 최적화 ================= */
   @media print {
-    body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; }
+    body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; word-break: keep-all; }
     .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode, #toastBox { display: none !important; }
     .hero { background: white !important; color: black !important; padding: 20px 0 !important; border-bottom: 2px solid var(--navy); }
     .hero h1 { color: black !important; text-align: center; margin-bottom: 8px; }
@@ -304,9 +309,14 @@
     .hero::before, .hero::after { display: none !important; }
     .logo-container { display: none !important; }
     .main { max-width: 100% !important; padding: 0 20px !important; }
+    
+    /* 2단 그리드 강제 유지 및 여백 축소 */
+    #dDetailedStatsContainer, #dOtherStatsContainer { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+    #dOtherStatsContainer { margin-top: 12px !important; }
+    
     .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 20px 0 10px 0 !important; }
     .q-block { border: none !important; box-shadow: none !important; padding: 10px 0 !important; page-break-inside: avoid; }
-    .report-card { border: 1px solid #ddd !important; box-shadow: none !important; padding: 20px !important; margin-bottom: 20px !important; }
+    .report-card, #dOtherStatsContainer .section-card { border: 1px solid #ddd !important; box-shadow: none !important; padding: 16px !important; margin-bottom: 0 !important; page-break-inside: avoid !important; break-inside: avoid !important; }
     .report-avg { border: 1px solid #ddd !important; background: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .dist-bar-bg { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .dist-bar-fill { background: #555 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -329,6 +339,9 @@
     /* 모바일에서 관리자 탭 활성화 및 가로 스크롤 적용 */
     .nav-tabs { display: flex; width: 100%; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start; }
     .nav-tab { flex: 1; min-width: max-content; padding: 12px 16px; font-size: 13px; height: auto; border-bottom: 3px solid transparent; }
+    
+    /* 모바일은 다시 1단으로 원복 */
+    #dDetailedStatsContainer, #dOtherStatsContainer { grid-template-columns: 1fr !important; }
     
     .b-row { flex-direction: column; }
     select.b-input { width: 100%; }
