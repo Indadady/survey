@@ -310,7 +310,7 @@
     line-height: 1.6;
   }
 
-  /* ================= 2. 폼(고객 참여) 뷰 전용 (5점 척도 유지) ================= */
+  /* ================= 2. 폼(고객 참여) 뷰 전용 ================= */
   .q-block {
     padding: 28px;
     margin-bottom: 16px;
@@ -379,7 +379,7 @@
 
   .primary-btn:hover { background: var(--navy); }
 
-  /* ================= 3. 보고서 대시보드 전용 (10점 환산 및 2단 최적화) ================= */
+  /* ================= 3. 보고서 대시보드 전용 ================= */
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
   .stat-box { padding: 20px; text-align: center; }
   .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 700; }
@@ -528,6 +528,7 @@
   .footer-box a { color: #6c757d; text-decoration: none; font-weight: 800; }
   .print-footer-logo { display: none; }
 
+  /* ================= 📱 모바일 최적화 ================= */
   @media (max-width: 768px) {
     :root { --nav-height: 108px; }
     .admin-nav { flex-wrap: wrap; padding: 12px 16px 0; justify-content: space-between; align-items: flex-start; }
@@ -546,8 +547,13 @@
     .report-avg .txt { margin-top: 0; }
     .section-title { flex-direction: column; align-items: flex-start; gap: 10px; }
     .dist-badge { white-space: normal; }
-    .builder-item-fixed > div > div:last-child { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-    .builder-item-fixed .print-btn { width: 100%; justify-content: center; text-align: center; }
+    
+    #bEventIdBlock > div { flex-direction: column !important; align-items: stretch !important; }
+    #bEventIdBlock > div > div { width: 100% !important; }
+    #bEventId { max-width: 100% !important; margin-bottom: 8px; }
+    #bEventIdBlock > div > div:last-child { flex-direction: column; gap: 8px; margin-top: 4px; }
+    #bEventIdBlock .print-btn { width: 100%; justify-content: center; text-align: center; padding: 12px !important; font-size: 14px; }
+
     #viewDashboard > div:first-child > div:nth-child(2) { flex-direction: column; width: 100%; }
     #viewDashboard > div:first-child > div:nth-child(2) button { width: 100%; }
   }
@@ -715,7 +721,7 @@
     </div>
 
     <div class="section-card">
-      <div class="section-title">💬 종합의견 및 제안사항</div>
+      <div class="section-title">💬 주관식 의견 리스트</div>
       <div class="feedback-list" id="dFeedbackList"></div>
     </div>
   </div>
@@ -769,7 +775,7 @@
     measurementId: "G-1XNBKXBZ0P"
   };
 
-  // 디폴트값: 성명/연락처 수집 OFF, 주관식 단일 문항 통합
+  // ★ 요청사항 반영: 주관식 2개(종합의견, 제안사항) 원상 복구 및 디폴트값 설정
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
@@ -784,7 +790,8 @@
       { id: "q_trans", type: "scale", title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?", required: true },
       { id: "q_guide", type: "scale", title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?", required: true },
       { id: "q_total", type: "scale", title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?", required: true },
-      { id: "q_feedback", type: "textarea", title: "[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.", required: false }
+      { id: "q_fb", type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점이나 아쉬웠던 점을 자유롭게 적어주세요.", required: false },
+      { id: "q_idea", type: "textarea", title: "[제안사항] 향후 기획될 행사에 적용해보고 싶은 새로운 아이디어나 제안 사항이 있다면 공유해주세요.", required: false }
     ],
     lastDistributedAt: null
   };
@@ -830,33 +837,13 @@
     if (typeof rawConfig.collectIdentity !== 'boolean') merged.collectIdentity = identityQuestions.length > 0 ? false : !!merged.collectIdentity;
     if (typeof rawConfig.collectContact !== 'boolean') merged.collectContact = contactQuestions.length > 0 ? false : !!merged.collectContact;
 
+    // 성명/연락처 항목은 설정 스위치에서 통제하므로 질문 리스트에서 제외
     questions = questions.filter(q => {
       if (q.id === 'q_name' || q.id === 'q_contact') return false;
       if (String(q.title || '').includes('성명') && String(q.title || '').includes('소속')) return false;
       if (String(q.title || '').includes('연락처')) return false;
       return true;
     });
-
-    const hasUnifiedFeedback = questions.some(q => q.id === 'q_feedback');
-    const legacyFeedbacks = questions.filter(q => ['q_fb', 'q_idea'].includes(q.id));
-    if (!hasUnifiedFeedback && legacyFeedbacks.length > 0) {
-      questions = questions.filter(q => !['q_fb', 'q_idea'].includes(q.id));
-      questions.push({
-        id: 'q_feedback',
-        type: 'textarea',
-        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
-        required: false
-      });
-    }
-
-    if (!questions.some(q => q.id === 'q_feedback')) {
-      questions.push({
-        id: 'q_feedback',
-        type: 'textarea',
-        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
-        required: false
-      });
-    }
 
     merged.questions = questions;
     return merged;
