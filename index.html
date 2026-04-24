@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>행사/연수 스마트 설문조사 플랫폼 - 투어메이커</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JLH9GD9SVR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JLH9GD9SVR');
+</script>
+<!-- 폰트 적용 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1A3A5C;
+    --teal: #0A7A6E;
+    --teal-light: #E6F4F0;
+    --teal-mid: #5DCAA5;
+    --gold: #C47A00;
+    --slate: #4A6278;
+    --slate-light: #E8F4F8;
+    --text: #1A1A1A;
+    --text-sub: #5A6672;
+    --border: #D0DDE6;
+    --bg: #F4F7F6;
+    --white: #FFFFFF;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --nav-height: 60px;
+  }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  /* ================= 관리자 네비게이션 ================= */
+  .admin-nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--nav-height); background: var(--navy); color: white;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 20px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .nav-brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .nav-tabs { display: flex; height: 100%; gap: 4px; }
+  .nav-tab {
+    background: transparent; color: rgba(255,255,255,0.7); border: none;
+    font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
+    padding: 0 20px; height: 100%; transition: all 0.2s; border-bottom: 3px solid transparent;
+  }
+  .nav-tab:hover { color: white; background: rgba(255,255,255,0.05); }
+  .nav-tab.active { color: white; border-bottom-color: var(--teal-mid, #5DCAA5); background: rgba(255,255,255,0.1); }
+  .share-btn {
+    background: var(--teal); color: white; border: none; padding: 8px 16px;
+    border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s;
+  }
+  .share-btn:hover { background: #086056; }
+
+  body.admin-mode { padding-top: var(--nav-height); }
+
+  /* ================= 공통 레이아웃 ================= */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #0A4A6E 60%, var(--teal) 100%);
+    color: white; padding: 60px 24px 40px; text-align: left; position: relative; overflow: hidden;
+  }
+  .hero::before, .hero::after { content: ''; position: absolute; border-radius: 50%; }
+  .hero::before { top: -60px; right: -60px; width: 240px; height: 240px; background: rgba(255,255,255,0.04); }
+  .hero::after { bottom: -40px; left: -40px; width: 180px; height: 180px; background: rgba(10,122,110,0.2); }
+  
+  .logo-container { position: absolute; top: 24px; left: 24px; z-index: 10; }
+  .logo-container img { max-height: 28px; filter: brightness(0) invert(1); }
+  
+  .hero h1 { font-size: clamp(24px, 5vw, 32px); font-weight: 700; margin-bottom: 12px; position: relative; z-index: 1; letter-spacing: -0.5px; }
+  .hero p { font-size: 15px; color: rgba(255,255,255,0.85); max-width: 560px; position: relative; z-index: 1; font-weight: 300; white-space: pre-wrap;}
+
+  .main { max-width: 760px; margin: 0 auto; padding: 0 16px 80px; }
+  
+  .view-section { display: none; animation: fadeIn 0.3s ease; }
+  .view-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-card {
+    background: var(--white); border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 28px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .card-header-offset { margin-top: -30px; position: relative; z-index: 10; border-top: 8px solid var(--teal); }
+  
+  .section-title {
+    font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 24px;
+    padding-bottom: 14px; border-bottom: 2px solid var(--teal-light);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  /* ================= 1. 빌더(관리자) 뷰 전용 ================= */
+  .builder-item {
+    background: var(--white); border: 1px solid var(--border); padding: 24px;
+    border-radius: var(--radius-sm); margin-bottom: 16px; position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;
+    border-left: 4px solid transparent;
+  }
+  .builder-item:hover, .builder-item:focus-within { border-left-color: var(--teal); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  
+  .b-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+  .b-input {
+    width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px;
+    font-family: inherit; font-size: 15px; background: #fdfdfd; transition: border 0.2s;
+  }
+  .b-input:focus { border-bottom: 2px solid var(--teal); outline: none; background: #fff; }
+  .b-input.title-input { font-size: 16px; font-weight: 600; }
+  
+  textarea.b-input { min-height: 80px; resize: vertical; }
+  select.b-input { width: 180px; flex-shrink: 0; cursor: pointer; }
+  
+  .b-options-container { margin-left: 8px; margin-bottom: 16px; }
+  .b-option-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .b-option-row::before { content: '○'; color: var(--slate); font-size: 18px; }
+  .b-option-input { flex-grow: 1; border: none; border-bottom: 1px solid var(--border); padding: 8px; font-size: 14px; outline: none;}
+  .b-option-input:focus { border-bottom-color: var(--teal); }
+  .b-btn-del-opt { background: transparent; border: none; color: var(--slate); font-size: 18px; cursor: pointer; }
+  .b-btn-add-opt { background: transparent; border: none; color: var(--teal); font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px; margin-top: 4px;}
+  
+  .b-footer { display: flex; justify-content: flex-end; align-items: center; gap: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .b-required-toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate); cursor: pointer; }
+  .b-required-toggle input { accent-color: var(--teal); width: 16px; height: 16px; cursor: pointer;}
+  
+  .btn-remove-card { background: transparent; color: #c62828; border: none; font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px;}
+  .btn-remove-card:hover { background: #ffebee; border-radius: 4px; }
+
+  .floating-add-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; background: var(--white); color: var(--teal); border: 2px dashed var(--teal-mid);
+    padding: 16px; border-radius: var(--radius-sm); font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s;
+  }
+  .floating-add-btn:hover { background: var(--teal-light); border-color: var(--teal); }
+
+  /* ================= 2. 폼(고객 참여) 뷰 전용 ================= */
+  .q-block { background: var(--white); border: 1px solid var(--border); padding: 28px; border-radius: var(--radius-sm); margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+  .q-block.header-block { border-top: 8px solid var(--navy); margin-top: -30px; position: relative; z-index: 10;}
+  .q-label { display: block; font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+  .q-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 16px; white-space: pre-wrap; }
+  .q-required { color: #E24B4A; margin-left: 3px; font-weight: bold;}
+  
+  .scale-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .scale-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--slate); margin: 0 5px 8px 0; font-weight: 500; }
+  .scale-option label {
+    display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
+    padding: 14px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 500; color: var(--text-sub); transition: all 0.15s; background: var(--bg);
+  }
+  .scale-option input[type="radio"] { accent-color: var(--teal); width: 18px; height: 18px; }
+  .scale-option label.selected { background: var(--teal-light); border-color: var(--teal); color: var(--teal); font-weight: 700; }
+
+  .radio-list { display: flex; flex-direction: column; gap: 12px; }
+  .radio-item label { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s;}
+  .radio-item label:hover { background: var(--bg); }
+  .radio-item input[type="radio"] { accent-color: var(--teal); width: 18px; height: 18px; cursor: pointer; }
+
+  .text-input {
+    width: 100%; padding: 12px 14px; border: none; border-bottom: 1px solid var(--slate);
+    font-family: inherit; font-size: 15px; outline: none; transition: border-color 0.2s; background: transparent;
+  }
+  .text-input:focus { border-bottom: 2px solid var(--teal); }
+  textarea.text-input { resize: vertical; min-height: 80px; border: 1px solid var(--border); border-radius: 4px; padding: 14px; background: #fff;}
+  textarea.text-input:focus { border: 1px solid var(--teal); box-shadow: 0 0 0 3px rgba(10,122,110,0.1); }
+
+  .primary-btn {
+    width: 100%; padding: 16px; background: var(--teal); color: white; border: none;
+    border-radius: var(--radius); font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 24px; transition: background 0.2s;
+  }
+  .primary-btn:hover { background: var(--navy); }
+
+  /* ================= 3. 보고서 대시보드 전용 (PDF 톤앤매너 완벽 반영) ================= */
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; text-align: center; }
+  .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 600; }
+  .stat-box .value { font-size: 32px; font-weight: 800; color: var(--navy); }
+  
+  /* 문항별 상세 보고서 카드 */
+  .report-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); page-break-inside: avoid; }
+  .report-q-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 20px; line-height: 1.5; }
+  .report-body { display: flex; gap: 32px; align-items: center; }
+  
+  /* 평균 점수 박스 */
+  .report-avg { flex-shrink: 0; width: 120px; text-align: center; background: var(--teal-light); padding: 20px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1);}
+  .report-avg .num { font-size: 36px; font-weight: 800; color: var(--teal); line-height: 1; }
+  .report-avg .txt { font-size: 13px; color: var(--navy); margin-top: 8px; font-weight: 600; }
+  
+  /* 분포 막대 그래프 영역 */
+  .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
+  .dist-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+  .dist-label { width: 36px; color: var(--slate); font-weight: 600; text-align: right; }
+  .dist-bar-bg { flex-grow: 1; height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+  .dist-bar-fill { height: 100%; background: var(--teal-mid); border-radius: 6px; transition: width 0.8s ease-out; }
+  .dist-pct { width: 45px; text-align: right; font-weight: 700; color: var(--navy); }
+  
+  .feedback-list { display: flex; flex-direction: column; gap: 12px; }
+  .feedback-item { background: var(--bg); border-left: 4px solid var(--teal); padding: 16px; border-radius: 4px; font-size: 14px; page-break-inside: avoid; }
+  .feedback-meta { font-size: 12px; color: var(--slate); margin-bottom: 8px; font-weight: 600; display: flex; justify-content: space-between;}
+  .feedback-q { font-weight: 700; color: var(--navy); margin-top: 8px; margin-bottom: 4px; font-size: 13px;}
+  
+  .print-btn {
+    background: var(--navy); color: white; border: none; padding: 8px 16px;
+    border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+
+  .footer-box { text-align: center; padding: 24px 16px; font-size: 12px; color: #6c757d; margin-top: 40px; border-top: 1px solid var(--border); }
+  .footer-box a { color: #6c757d; text-decoration: none; font-weight: bold; }
+  
+  #loadingOverlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.9); z-index: 2000; justify-content: center; align-items: center;
+    font-weight: 700; color: var(--teal); font-size: 18px; flex-direction: column; gap: 12px;
+  }
+  .spinner { width: 40px; height: 40px; border: 4px solid var(--teal-light); border-top: 4px solid var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  /* ================= 투어메이커 표준 인쇄(PDF) 톤앤매너 최적화 ================= */
+  @media print {
+    body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; }
+    .admin-nav, .primary-btn, .print-btn, .floating-add-btn { display: none !important; }
+    .hero { background: white !important; color: black !important; padding: 20px 0 !important; border-bottom: 2px solid var(--navy); }
+    .hero h1 { color: black !important; text-align: center; margin-bottom: 8px;}
+    .hero p { color: black !important; text-align: center; max-width: 100%; margin-bottom: 0;}
+    .hero::before, .hero::after { display: none !important; }
+    .logo-container { position: static !important; text-align: center; margin-bottom: 16px; }
+    .logo-container img { filter: none !important; max-height: 40px;}
+    .main { max-width: 100% !important; padding: 0 20px !important; }
+    
+    .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 20px 0 10px 0 !important; }
+    .q-block { border: none !important; box-shadow: none !important; padding: 10px 0 !important; page-break-inside: avoid;}
+    
+    /* 인쇄용 카드 색상 강제 렌더링 */
+    .report-card { border: 1px solid #ddd !important; box-shadow: none !important; padding: 20px !important; margin-bottom: 20px !important; }
+    .report-avg { border: 1px solid #ddd !important; background: #fafafa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .dist-bar-bg { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .dist-bar-fill { background: #555 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    
+    .feedback-item { border-left-color: #555 !important; background: #fff !important; border: 1px solid #ddd !important; margin-bottom: 12px;}
+    .footer-box { margin-top: 30px; border-top: 1px solid #000; padding: 10px 0; font-size: 11px; text-align: center; color: #000 !important; display: block !important;}
+  }
+
+  @media (max-width: 768px) {
+    .nav-tabs { display: none; }
+    .admin-nav { overflow-x: auto; padding: 0 10px; }
+    .nav-brand { display: none; }
+    .b-row { flex-direction: column; }
+    select.b-input { width: 100%; }
+    /* 모바일에서는 통계 카드를 상하 배치 */
+    .report-body { flex-direction: column; gap: 20px; align-items: stretch; }
+    .report-avg { width: 100%; display: flex; justify-content: center; align-items: baseline; gap: 8px; padding: 16px;}
+    .report-avg .txt { margin-top: 0; }
+  }
+</style>
+</head>
+<body class="admin-mode" id="bodyEl">
+
+<div id="loadingOverlay"><div class="spinner"></div><span id="loadingMsg">데이터 처리 중...</span></div>
+
+<nav class="admin-nav" id="adminNav">
+  <div class="nav-brand">🛠️ 투어메이커 폼 빌더</div>
+  <div class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" data-target="viewBuilder">📝 설문지 제작</button>
+    <button class="nav-tab" data-target="viewForm">🖥️ 고객 화면(미리보기)</button>
+    <button class="nav-tab" data-target="viewDashboard">📊 연수 종료 보고서</button>
+  </div>
+  <button class="share-btn" onclick="copyShareLink()">🔗 배포 링크 복사</button>
+</nav>
+
+<div class="hero">
+  <div class="logo-container">
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="투어메이커">
+  </div>
+  <h1 id="uiHeroTitle">로딩 중...</h1>
+  <p id="uiHeroDesc"></p>
+</div>
+
+<div class="main">
+  <!-- 1. 빌더 뷰 -->
+  <div id="viewBuilder" class="view-section active">
+    <div class="builder-item card-header-offset" style="border-top: 8px solid var(--navy);">
+      <input type="text" class="b-input title-input" id="bTitle" placeholder="설문지 제목" style="border:none; border-bottom:1px solid var(--border); font-size:24px; padding:12px 0;">
+      <textarea class="b-input" id="bDesc" placeholder="설문지 설명 및 안내 문구" style="border:none; padding:12px 0; min-height:60px; margin-top:8px;"></textarea>
+    </div>
+    <div id="bQuestionList"></div>
+    <button class="floating-add-btn" onclick="addQuestionCard()">
+      <span style="font-size: 20px;">+</span> 새로운 문항 추가
+    </button>
+    <button class="primary-btn" onclick="saveConfigData()">💾 저장 및 폼 업데이트</button>
+  </div>
+
+  <!-- 2. 폼 뷰 -->
+  <div id="viewForm" class="view-section">
+    <div id="fFormContainer"></div>
+    <button class="primary-btn" onclick="submitSurvey()">설문 제출하기</button>
+  </div>
+
+  <!-- 3. 대시보드 뷰 (연수종료보고서 톤앤매너) -->
+  <div id="viewDashboard" class="view-section">
+    <div class="section-card card-header-offset">
+      <div class="section-title">
+        📊 만족도 종합 결과
+        <button class="print-btn" onclick="window.print()">🖨️ 보고서 PDF 인쇄</button>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <h4>총 응답자 수</h4>
+          <div class="value" id="dTotalCount">0명</div>
+        </div>
+        <div class="stat-box">
+          <h4>전체 평균 만족도 (5점 척도 기준)</h4>
+          <div class="value" id="dTotalAvg">0.0점</div>
+        </div>
+      </div>
+      
+      <!-- 상세 보고서 문항별 통계가 들어갈 컨테이너 -->
+      <div id="dDetailedStatsContainer"></div>
+      
+    </div>
+    <div id="dOtherStatsContainer"></div>
+    <div class="section-card">
+      <div class="section-title">💬 주관식 의견 리스트</div>
+      <div class="feedback-list" id="dFeedbackList"></div>
+    </div>
+  </div>
+
+  <div id="viewComplete" class="view-section">
+    <div class="q-block header-block" style="text-align: center; padding: 60px 20px;">
+      <div style="font-size: 56px; margin-bottom: 16px;">✈️</div>
+      <h2 style="font-size: 24px; color: var(--navy); margin-bottom: 12px; font-weight: 700;">설문이 완료되었습니다.</h2>
+      <p style="color: var(--slate); line-height: 1.7;">귀하의 소중한 의견은 다음 행사 준비에<br>적극적으로 반영하겠습니다.<br>함께해주셔서 대단히 감사합니다.</p>
+    </div>
+  </div>
+
+  <div class="footer-box">
+    [System Powered by TOURMAKER] 본 설문조사는 참여 기관의 기획과 투어메이커의 트래블 테크 기술 제휴로 제작되었습니다.<br>
+    <a href="https://tourmaker.kr" target="_blank">투어메이커 바로가기</a>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const isCustomerMode = urlParams.get('mode') === 'view'; 
+  
+  let currentConfig = {
+    title: "행사/연수 만족도 조사",
+    desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
+    questions: [
+      { id: "q_name", type: "text", title: "성명 및 소속", required: false },
+      { id: "q_contact", type: "text", title: "연락처", required: true },
+      { id: "q_prep", type: "scale", title: "[사전준비] 안내 자료와 설명회 등 사전 준비 과정은 실질적인 도움이 되었습니까?", required: true },
+      { id: "q_sch", type: "scale", title: "[일정구성] 방문지 구성과 체류 시간 등 전체적인 일정은 유익하고 적절했습니까?", required: true },
+      { id: "q_op", type: "scale", title: "[콘텐츠·운영] 프로그램 내용과 행사 현장에서의 세심한 배려(운영)에 만족하십니까?", required: true },
+      { id: "q_hotel", type: "scale", title: "[숙박] 이용하신 숙소는 청결하고 편안하게 휴식하기 좋았습니까?", required: true },
+      { id: "q_meal", type: "scale", title: "[식사] 제공된 식사는 현지의 특색을 느낄 수 있고 입맛에 맞았습니까?", required: true },
+      { id: "q_trans", type: "scale", title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?", required: true },
+      { id: "q_guide", type: "scale", title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?", required: true },
+      { id: "q_total", type: "scale", title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?", required: true },
+      { id: "q_fb", type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점이나 아쉬웠던 점을 자유롭게 적어주세요.", required: false },
+      { id: "q_idea", type: "textarea", title: "[제안사항] 향후 기획될 행사에 적용해보고 싶은 새로운 아이디어나 제안 사항이 있다면 공유해주세요.", required: false }
+    ]
+  };
+
+  const uiHeroTitle = document.getElementById('uiHeroTitle');
+  const uiHeroDesc = document.getElementById('uiHeroDesc');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+
+  if (isCustomerMode) {
+    document.getElementById('adminNav').style.display = 'none';
+    document.getElementById('bodyEl').classList.remove('admin-mode');
+    switchTab('viewForm');
+  } else {
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        switchTab(e.target.dataset.target);
+      });
+    });
+  }
+
+  function switchTab(targetId) {
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(targetId).classList.add('active');
+    
+    if(targetId === 'viewBuilder') renderBuilder();
+    if(targetId === 'viewForm') renderForm();
+    if(targetId === 'viewDashboard') fetchAndRenderDashboard();
+  }
+
+  window.copyShareLink = function() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('mode', 'view');
+    const tempInput = document.createElement("input");
+    tempInput.value = url.toString();
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert('배포용 링크가 복사되었습니다!\\n고객은 이 링크 접속 시 관리자 메뉴를 볼 수 없습니다.');
+  };
+
+  let app, auth, db;
+  const appId = typeof __app_id !== 'undefined' ? __app_id : 'tourmaker-survey-gform';
+  
+  try {
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { projectId: "demo" };
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch (error) { console.error("Firebase Init Error:", error); }
+
+  function showLoading(show) { loadingOverlay.style.display = show ? 'flex' : 'none'; }
+
+  const initAuth = async () => {
+    try {
+      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+        await signInWithCustomToken(auth, __initial_auth_token);
+      } else {
+        await signInAnonymously(auth);
+      }
+    } catch (error) { console.error("Auth init failed:", error); }
+  };
+
+  if (auth) {
+    initAuth().then(() => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          await loadConfigFromDB();
+          uiHeroTitle.innerText = currentConfig.title;
+          uiHeroDesc.innerText = currentConfig.desc;
+          if(isCustomerMode) switchTab('viewForm');
+          else switchTab('viewBuilder');
+        }
+      });
+    });
+  } else {
+    renderBuilder();
+    uiHeroTitle.innerText = currentConfig.title;
+    uiHeroDesc.innerText = currentConfig.desc;
+  }
+
+  async function loadConfigFromDB() {
+    if (!auth || !auth.currentUser) return;
+    try {
+      const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
+      const snap = await getDocs(collRef);
+      if (!snap.empty) {
+        currentConfig = snap.docs[0].data();
+      }
+    } catch(e) { console.warn("설정 로드 실패, 기본값 사용"); }
+  }
+
+  function renderBuilder() {
+    document.getElementById('bTitle').value = currentConfig.title;
+    document.getElementById('bDesc').value = currentConfig.desc;
+    
+    const list = document.getElementById('bQuestionList');
+    list.innerHTML = '';
+    
+    currentConfig.questions.forEach(q => {
+      list.appendChild(createQuestionCard(q));
+    });
+  }
+
+  window.addQuestionCard = function() {
+    const newQ = { id: 'q_' + Date.now(), type: 'scale', title: '새로운 질문', required: true, options: ['옵션 1'] };
+    document.getElementById('bQuestionList').appendChild(createQuestionCard(newQ));
+  };
+
+  function createQuestionCard(q) {
+    const card = document.createElement('div');
+    card.className = 'builder-item';
+    card.dataset.id = q.id;
+    
+    const types = [
+      { val: 'scale', txt: '5점 척도 (평가용)' },
+      { val: 'radio', txt: '객관식 (단일 선택)' },
+      { val: 'text', txt: '단답형 텍스트' },
+      { val: 'textarea', txt: '장문형 텍스트' }
+    ];
+    let typeOptions = types.map(t => `<option value="${t.val}" ${q.type === t.val ? 'selected' : ''}>${t.txt}</option>`).join('');
+
+    card.innerHTML = `
+      <div class="b-row">
+        <input type="text" class="b-input title-input b-q-title" value="${q.title}" placeholder="질문을 입력하세요">
+        <select class="b-input b-q-type">${typeOptions}</select>
+      </div>
+      <div class="b-options-container" style="display: ${q.type === 'radio' ? 'block' : 'none'}">
+      </div>
+      <div class="b-footer">
+        <label class="b-required-toggle">
+          <span>필수 항목</span>
+          <input type="checkbox" class="b-q-required" ${q.required ? 'checked' : ''}>
+        </label>
+        <button class="btn-remove-card" onclick="this.closest('.builder-item').remove()">🗑️ 삭제</button>
+      </div>
+    `;
+
+    const typeSelect = card.querySelector('.b-q-type');
+    const optionsContainer = card.querySelector('.b-options-container');
+
+    const renderOptionsUI = () => {
+      if (typeSelect.value !== 'radio') {
+        optionsContainer.style.display = 'none';
+        return;
+      }
+      optionsContainer.style.display = 'block';
+      optionsContainer.innerHTML = '';
+      const opts = q.options && q.options.length > 0 ? q.options : ['옵션 1'];
+      opts.forEach(opt => addOptionRow(optionsContainer, opt));
+      
+      const addBtn = document.createElement('button');
+      addBtn.className = 'b-btn-add-opt';
+      addBtn.innerHTML = '+ 옵션 추가';
+      addBtn.onclick = () => addOptionRow(optionsContainer, `옵션 ${optionsContainer.querySelectorAll('.b-option-row').length + 1}`);
+      optionsContainer.appendChild(addBtn);
+    };
+
+    typeSelect.addEventListener('change', renderOptionsUI);
+    renderOptionsUI();
+
+    return card;
+  }
+
+  function addOptionRow(container, val) {
+    const row = document.createElement('div');
+    row.className = 'b-option-row';
+    row.innerHTML = `
+      <input type="text" class="b-option-input" value="${val}" placeholder="옵션 내용">
+      <button class="b-btn-del-opt" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.insertBefore(row, container.lastElementChild);
+  }
+
+  window.saveConfigData = async function() {
+    if (!auth || !auth.currentUser) { alert("인증 정보가 없습니다. 다시 시도해주세요."); return; }
+    showLoading(true);
+    
+    const newConfig = {
+      title: document.getElementById('bTitle').value.trim(),
+      desc: document.getElementById('bDesc').value.trim(),
+      questions: []
+    };
+
+    document.querySelectorAll('.builder-item').forEach(card => {
+      const type = card.querySelector('.b-q-type').value;
+      const q = {
+        id: card.dataset.id,
+        type: type,
+        title: card.querySelector('.b-q-title').value.trim() || '제목 없는 질문',
+        required: card.querySelector('.b-q-required').checked
+      };
+
+      if (type === 'radio') {
+        q.options = Array.from(card.querySelectorAll('.b-option-input')).map(inp => inp.value.trim()).filter(v => v);
+        if(q.options.length === 0) q.options = ['기본 옵션'];
+      }
+      newConfig.questions.push(q);
+    });
+
+    currentConfig = newConfig;
+    uiHeroTitle.innerText = currentConfig.title;
+    uiHeroDesc.innerText = currentConfig.desc;
+
+    try {
+      if (db) {
+        const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
+        const snap = await getDocs(collRef);
+        if(snap.empty) await addDoc(collRef, currentConfig);
+        else await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'survey_settings', snap.docs[0].id), currentConfig);
+      }
+      alert('설정이 저장되었습니다. 고객 화면 탭을 확인해 보세요.');
+    } catch(e) { console.error(e); alert('DB 연결 실패. 임시 메모리에만 적용됩니다.'); }
+    showLoading(false);
+  };
+
+  function renderForm() {
+    const container = document.getElementById('fFormContainer');
+    container.innerHTML = `
+      <div class="q-block header-block">
+        <h2 style="font-size:22px; margin-bottom:8px; color:var(--navy);">${currentConfig.title}</h2>
+        <p style="color:var(--text-sub); white-space:pre-wrap;">${currentConfig.desc}</p>
+        <p style="color:#E24B4A; font-size:13px; margin-top:16px;">* 필수항목</p>
+      </div>
+    `;
+
+    currentConfig.questions.forEach((q, idx) => {
+      let contentHTML = '';
+      const reqMark = q.required ? '<span class="q-required">*</span>' : '';
+
+      if (q.type === 'scale') {
+        contentHTML = `
+          <div class="scale-labels"><span>매우 불만족(1)</span><span>매우 만족(5)</span></div>
+          <div class="scale-options">
+            ${[1,2,3,4,5].map(val => `<div class="scale-option"><label><input type="radio" name="${q.id}" value="${val}"><span>${val}</span></label></div>`).join('')}
+          </div>`;
+      } else if (q.type === 'radio') {
+        contentHTML = `<div class="radio-list">` + 
+          q.options.map((opt, i) => `<div class="radio-item"><label><input type="radio" name="${q.id}" value="${opt}">${opt}</label></div>`).join('') +
+          `</div>`;
+      } else if (q.type === 'text') {
+        contentHTML = `<input type="text" class="text-input" name="${q.id}" placeholder="내용을 입력해주세요">`;
+      } else if (q.type === 'textarea') {
+        contentHTML = `<textarea class="text-input" name="${q.id}" placeholder="내용을 입력해주세요"></textarea>`;
+      }
+
+      container.insertAdjacentHTML('beforeend', `
+        <div class="q-block" data-id="${q.id}" data-type="${q.type}" data-required="${q.required}">
+          <label class="q-label">${q.title} ${reqMark}</label>
+          ${contentHTML}
+        </div>
+      `);
+    });
+
+    document.querySelectorAll('.scale-option input[type="radio"]').forEach(input => {
+      input.addEventListener('change', function() {
+        document.querySelectorAll(`input[name="${this.name}"]`).forEach(radio => radio.closest('label').classList.remove('selected'));
+        if (this.checked) this.closest('label').classList.add('selected');
+      });
+    });
+  }
+
+  window.submitSurvey = async function() {
+    if (!auth || !auth.currentUser) { alert("인증 정보가 없습니다. 잠시 후 다시 시도해주세요."); return; }
+
+    const payload = { createdAt: new Date().toISOString() };
+    let isValid = true;
+
+    document.querySelectorAll('#fFormContainer .q-block').forEach(block => {
+      if(!block.dataset.id) return;
+      const id = block.dataset.id;
+      const type = block.dataset.type;
+      const isReq = block.dataset.required === 'true';
+      let val = null;
+
+      if (type === 'scale' || type === 'radio') {
+        const checked = block.querySelector(`input[name="${id}"]:checked`);
+        if (checked) val = type === 'scale' ? parseInt(checked.value) : checked.value;
+      } else {
+        val = block.querySelector(`[name="${id}"]`).value.trim();
+      }
+
+      if (isReq && (val === null || val === '')) {
+        isValid = false;
+        block.style.border = '1px solid #E24B4A';
+      } else {
+        block.style.border = '1px solid var(--border)';
+        payload[id] = val;
+      }
+    });
+
+    if (!isValid) {
+      alert('필수 문항을 모두 입력해 주세요. (빨간색 테두리 표시)');
+      return;
+    }
+
+    showLoading(true);
+    try {
+      if(db) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'), payload);
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById('viewComplete').classList.add('active');
+      window.scrollTo(0,0);
+    } catch(e) { console.error(e); alert('오류가 발생했습니다. 다시 시도해주세요.'); }
+    showLoading(false);
+  };
+
+  async function fetchAndRenderDashboard() {
+    if (!auth || !auth.currentUser) return;
+    showLoading(true);
+    
+    let responses = [];
+    try {
+      if(db) {
+        const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'));
+        snap.forEach(doc => responses.push(doc.data()));
+      }
+    } catch(e) { console.error(e); }
+
+    const count = responses.length;
+    document.getElementById('dTotalCount').innerText = `${count}명`;
+    const fbList = document.getElementById('dFeedbackList');
+    const otherStats = document.getElementById('dOtherStatsContainer');
+    const detailedContainer = document.getElementById('dDetailedStatsContainer');
+    
+    fbList.innerHTML = ''; 
+    otherStats.innerHTML = '';
+    detailedContainer.innerHTML = '';
+
+    if (count === 0) {
+      document.getElementById('dTotalAvg').innerText = `0.0점`;
+      fbList.innerHTML = '<p style="color:var(--slate);">제출된 응답이 없습니다.</p>';
+      showLoading(false); return;
+    }
+
+    const scaleQs = currentConfig.questions.filter(q => q.type === 'scale');
+    const radioQs = currentConfig.questions.filter(q => q.type === 'radio');
+    const textQs = currentConfig.questions.filter(q => q.type === 'text' || q.type === 'textarea');
+
+    // 1. Scale 통계 (PDF 보고서 톤앤매너 완벽 반영 - 상세 분포 막대)
+    if (scaleQs.length > 0) {
+      let grandTotal = 0;
+      let detailedHTML = '';
+
+      scaleQs.forEach((q, idx) => {
+        let sum = 0, validCount = 0;
+        let dist = {5:0, 4:0, 3:0, 2:0, 1:0};
+
+        responses.forEach(r => { 
+          if(r[q.id]) { 
+            sum += r[q.id]; 
+            validCount++; 
+            dist[r[q.id]]++;
+          } 
+        });
+        
+        const avg = validCount > 0 ? (sum / validCount) : 0;
+        grandTotal += avg;
+
+        // 분포도 막대 HTML 생성
+        let distRowsHTML = '';
+        for(let i=5; i>=1; i--) {
+          const pct = validCount > 0 ? Math.round((dist[i] / validCount) * 100) : 0;
+          distRowsHTML += `
+            <div class="dist-row">
+              <span class="dist-label">${i}점</span>
+              <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${pct}%"></div></div>
+              <span class="dist-pct">${pct}%</span>
+            </div>
+          `;
+        }
+
+        detailedHTML += `
+          <div class="report-card">
+            <div class="report-q-title">${idx + 1}. ${q.title}</div>
+            <div class="report-body">
+              <div class="report-avg">
+                <div class="num">${avg.toFixed(1)}</div>
+                <div class="txt">평균 점수</div>
+              </div>
+              <div class="report-dist">
+                ${distRowsHTML}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('dTotalAvg').innerText = `${(grandTotal / scaleQs.length).toFixed(2)}점`;
+      detailedContainer.innerHTML = detailedHTML;
+    } else {
+      document.getElementById('dTotalAvg').innerText = `-`;
+    }
+
+    // 2. Radio 문항 통계
+    radioQs.forEach(q => {
+      const tally = {};
+      q.options.forEach(opt => tally[opt] = 0);
+      let answeredCount = 0;
+
+      responses.forEach(r => {
+        if(r[q.id]) {
+          tally[r[q.id]] = (tally[r[q.id]] || 0) + 1;
+          answeredCount++;
+        }
+      });
+
+      let barsHTML = '';
+      for (const [opt, val] of Object.entries(tally)) {
+        const percent = answeredCount > 0 ? Math.round((val / answeredCount) * 100) : 0;
+        barsHTML += `
+          <div class="bar-chart-item">
+            <div class="bar-chart-label"><span>${opt}</span><span>${percent}% (${val}명)</span></div>
+            <div class="bar-chart-track"><div class="bar-chart-fill" style="width:${percent}%"></div></div>
+          </div>
+        `;
+      }
+
+      otherStats.insertAdjacentHTML('beforeend', `
+        <div class="section-card">
+          <div class="section-title" style="font-size:16px;">📊 ${q.title}</div>
+          ${barsHTML}
+        </div>
+      `);
+    });
+
+    // 3. 주관식 문항
+    responses.forEach(res => {
+      let hasFb = false;
+      let html = `<div class="feedback-meta"><span>📅 ${new Date(res.createdAt).toLocaleDateString()}</span></div>`;
+      
+      textQs.forEach(q => {
+        if(res[q.id]) {
+          hasFb = true;
+          html += `<div class="feedback-q">${q.title}</div><div style="white-space:pre-wrap;">${res[q.id]}</div>`;
+        }
+      });
+
+      if(hasFb) fbList.insertAdjacentHTML('beforeend', `<div class="feedback-item">${html}</div>`);
+    });
+
+    if(fbList.innerHTML === '') fbList.innerHTML = '<p style="color:var(--slate);">작성된 주관식 의견이 없습니다.</p>';
+    
+    showLoading(false);
+  }
+
+</script>
+
+</body>
+</html>
