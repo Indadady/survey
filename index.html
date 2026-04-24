@@ -310,7 +310,7 @@
     line-height: 1.6;
   }
 
-  /* ================= 2. 폼(고객 참여) 뷰 전용 ================= */
+  /* ================= 2. 폼(고객 참여) 뷰 전용 (5점 척도 유지) ================= */
   .q-block {
     padding: 28px;
     margin-bottom: 16px;
@@ -379,7 +379,7 @@
 
   .primary-btn:hover { background: var(--navy); }
 
-  /* ================= 3. 보고서 대시보드 전용 ================= */
+  /* ================= 3. 보고서 대시보드 전용 (10점 환산 및 2단 최적화) ================= */
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
   .stat-box { padding: 20px; text-align: center; }
   .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 700; }
@@ -775,7 +775,7 @@
     measurementId: "G-1XNBKXBZ0P"
   };
 
-  // ★ 요청사항 반영: 주관식 2개(종합의견, 제안사항) 원상 복구 및 디폴트값 설정
+  // ★ 디폴트: 성명/연락처 OFF, 주관식 단일 문항 통합 적용
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
@@ -790,8 +790,7 @@
       { id: "q_trans", type: "scale", title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?", required: true },
       { id: "q_guide", type: "scale", title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?", required: true },
       { id: "q_total", type: "scale", title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?", required: true },
-      { id: "q_fb", type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점이나 아쉬웠던 점을 자유롭게 적어주세요.", required: false },
-      { id: "q_idea", type: "textarea", title: "[제안사항] 향후 기획될 행사에 적용해보고 싶은 새로운 아이디어나 제안 사항이 있다면 공유해주세요.", required: false }
+      { id: "q_feedback", type: "textarea", title: "[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.", required: false }
     ],
     lastDistributedAt: null
   };
@@ -799,6 +798,15 @@
   const uiHeroTitle = document.getElementById('uiHeroTitle');
   const uiHeroDesc = document.getElementById('uiHeroDesc');
   const loadingOverlay = document.getElementById('loadingOverlay');
+
+  // ★ 고객 모드에서 관리자 기능 전면 차단 로직 (보안 강화)
+  function blockCustomerMode() {
+    if (isCustomerMode) {
+      alert('관리자 화면에서만 사용할 수 있는 기능입니다.');
+      return true;
+    }
+    return false;
+  }
 
   function escapeHTML(value) {
     return String(value ?? '')
@@ -837,13 +845,33 @@
     if (typeof rawConfig.collectIdentity !== 'boolean') merged.collectIdentity = identityQuestions.length > 0 ? false : !!merged.collectIdentity;
     if (typeof rawConfig.collectContact !== 'boolean') merged.collectContact = contactQuestions.length > 0 ? false : !!merged.collectContact;
 
-    // 성명/연락처 항목은 설정 스위치에서 통제하므로 질문 리스트에서 제외
     questions = questions.filter(q => {
       if (q.id === 'q_name' || q.id === 'q_contact') return false;
       if (String(q.title || '').includes('성명') && String(q.title || '').includes('소속')) return false;
       if (String(q.title || '').includes('연락처')) return false;
       return true;
     });
+
+    const hasUnifiedFeedback = questions.some(q => q.id === 'q_feedback');
+    const legacyFeedbacks = questions.filter(q => ['q_fb', 'q_idea'].includes(q.id));
+    
+    // 만약 예전 데이터(q_fb, q_idea)가 있고, 통합 문항이 없다면 새로 추가
+    if (!hasUnifiedFeedback && legacyFeedbacks.length > 0) {
+      questions = questions.filter(q => !['q_fb', 'q_idea'].includes(q.id));
+      questions.push({
+        id: 'q_feedback',
+        type: 'textarea',
+        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
+        required: false
+      });
+    } else if (!hasUnifiedFeedback) {
+      questions.push({
+        id: 'q_feedback',
+        type: 'textarea',
+        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
+        required: false
+      });
+    }
 
     merged.questions = questions;
     return merged;
@@ -861,7 +889,7 @@
     const badge = document.getElementById('dbStatusBadge');
     if (!badge) return;
     if (!isLocalMode && db) {
-      badge.innerText = '🟢 서버 연동 완료 (배포 가능)';
+      badge.innerText = '🟢 시스템 연동 완료 (배포 가능)';
       badge.style.background = 'rgba(46, 204, 113, 0.2)';
       badge.style.color = '#2ecc71';
       badge.style.borderColor = 'rgba(46, 204, 113, 0.4)';
@@ -1029,6 +1057,7 @@
   }
 
   window.loadEventData = async function() {
+    if (blockCustomerMode()) return;
     const inputCode = document.getElementById('bEventId').value.trim();
     if (!inputCode) { showToast('불러올 행사 코드를 입력해 주세요.'); return; }
 
@@ -1046,10 +1075,12 @@
     showToast(`[${currentEventId}] 행사 환경을 불러왔습니다.`);
   };
 
+  // ★ 배포 전 전체 설정 강제 저장 로직 추가
   window.copyShareLink = async function() {
+    if (blockCustomerMode()) return;
     const inputCode = document.getElementById('bEventId').value.trim();
     if (!inputCode) {
-      showToast('행사 고유 코드를 입력하고 [저장 및 업데이트] 후 배포해 주세요.');
+      showToast('행사 고유 코드를 입력해 주세요.');
       return;
     }
 
@@ -1057,14 +1088,33 @@
       alert('⚠️ 현재 로컬 테스트 모드입니다.\n이 링크를 고객에게 보내도 데이터가 서버에 취합되지 않을 수 있습니다.');
     }
 
+    // 1. 현재 화면의 모든 설정(문항, 체크박스 등)을 currentConfig 객체로 동기화
+    syncBuilderStateToConfig();
+    
+    // 2. 배포 시간 기록
+    const nowISO = new Date().toISOString();
+    currentConfig.lastDistributedAt = nowISO;
+    
+    showLoading(true, '배포 링크 생성 및 저장 중...');
+
+    // 3. 링크 생성 전, DB에 현재 설정 전체를 강제 덮어쓰기 저장 (중요)
+    try {
+      if (!isLocalMode && db && auth && auth.currentUser) {
+        await setDoc(getConfigDocRef(currentEventId), currentConfig);
+      } else {
+        localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
+      }
+      renderDistributionBadge();
+    } catch (err) {
+      console.warn('배포 전 자동 저장 실패:', err);
+    }
+
     const url = new URL(window.location.href);
     url.searchParams.set('mode', 'view');
     url.searchParams.set('eventId', inputCode);
     const longUrl = url.toString();
 
-    showLoading(true, '배포 링크 생성 중...');
     let shareUrl = longUrl;
-
     try {
       const res = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`);
       if (res.ok) {
@@ -1075,24 +1125,11 @@
       console.warn('단축 URL 생성 실패, 원본 URL 사용:', e);
     }
 
-    const nowISO = new Date().toISOString();
-    currentConfig.lastDistributedAt = nowISO;
-    try {
-      if (!isLocalMode && db && auth && auth.currentUser) {
-        await setDoc(getConfigDocRef(currentEventId), { lastDistributedAt: nowISO }, { merge: true });
-      } else {
-        localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
-      }
-      renderDistributionBadge();
-    } catch (err) {
-      console.warn('배포 시간 기록 실패:', err);
-    }
-
     showLoading(false);
 
     try {
       await navigator.clipboard.writeText(shareUrl);
-      showToast(`[${inputCode}] 배포 링크가 복사되었습니다!\n배포 시간이 기록되었습니다.`);
+      showToast(`[${inputCode}] 배포 링크가 복사되었습니다!\n현재 설정이 함께 저장되었습니다.`);
     } catch (e) {
       const tmp = document.createElement('textarea');
       tmp.value = shareUrl;
@@ -1121,6 +1158,7 @@
   }
 
   window.addQuestionCard = function() {
+    if (blockCustomerMode()) return;
     const newQ = { id: 'q_' + Date.now(), type: 'scale', title: '', required: true, options: ['옵션 1'] };
     const card = createQuestionCard(newQ);
     document.getElementById('bQuestionList').appendChild(card);
@@ -1196,6 +1234,7 @@
   }
 
   window.saveConfigData = async function() {
+    if (blockCustomerMode()) return;
     const inputCode = document.getElementById('bEventId').value.trim();
     if (!inputCode) {
       showToast('행사 고유 코드를 반드시 입력해 주세요.');
@@ -1580,7 +1619,7 @@
   function renderFeedback(responses) {
     const feedbackList = document.getElementById('dFeedbackList');
 
-    // 개인정보 항목(이름, 연락처)을 철저히 배제하고 순수 텍스트 의견 문항만 필터링
+    // ★ 주관식 의견 문항만 필터링 (이름, 연락처 문항 원천 배제)
     const textQuestions = currentConfig.questions
       .filter(q => q.type === 'textarea' || ['q_feedback', 'q_fb', 'q_idea'].includes(q.id))
       .filter(q => q.id !== 'q_name' && q.id !== 'q_contact' && !String(q.title).includes('성명') && !String(q.title).includes('연락처'));
@@ -1619,6 +1658,7 @@
   }
 
   window.resetSurveyData = async function() {
+    if (blockCustomerMode()) return;
     if (!confirm(`⚠️ 경고: [${currentEventId}]의 모든 응답 데이터가 삭제됩니다.\n테스트 완료 후 실제 고객에게 배포하기 전에만 사용하세요.\n정말 초기화 하시겠습니까?`)) return;
 
     showLoading(true, '응답 데이터 초기화 중...');
@@ -1640,6 +1680,7 @@
   };
 
   window.toggleEditMode = function() {
+    if (blockCustomerMode()) return;
     window.isEditMode = !window.isEditMode;
     document.body.classList.toggle('edit-mode', window.isEditMode);
     document.querySelectorAll('.editable-field').forEach(el => {
@@ -1650,6 +1691,7 @@
   };
 
   window.printReport = function() {
+    if (blockCustomerMode()) return;
     if (window.isEditMode) window.toggleEditMode();
     const activeBefore = Array.from(document.querySelectorAll('.view-section')).find(sec => sec.classList.contains('active'))?.id;
     document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
