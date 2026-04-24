@@ -124,13 +124,7 @@
   .b-input:focus { border-bottom: 2px solid var(--teal); outline: none; background: #fff; }
   .b-input.title-input { font-size: 16px; font-weight: 600; }
   
-  /* 메모장처럼 자동 높이 조절되는 텍스트 공간 */
-  .auto-expand {
-    resize: none;
-    overflow: hidden;
-    line-height: 1.5;
-  }
-
+  .auto-expand { resize: none; overflow: hidden; line-height: 1.5; }
   select.b-input { width: 180px; flex-shrink: 0; cursor: pointer; }
   
   .b-options-container { margin-left: 8px; margin-bottom: 16px; }
@@ -202,24 +196,43 @@
   .report-body { display: flex; gap: 32px; align-items: center; }
   
   .report-avg { flex-shrink: 0; width: 120px; text-align: center; background: var(--teal-light); padding: 20px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1);}
-  .report-avg .num { font-size: 36px; font-weight: 800; color: var(--teal); line-height: 1; }
+  .report-avg .num { font-size: 36px; font-weight: 800; color: var(--teal); line-height: 1; display: inline-block; min-width: 60px;}
   .report-avg .txt { font-size: 13px; color: var(--navy); margin-top: 8px; font-weight: 600; }
   
   .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 10px; }
   .dist-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
   .dist-label { width: 36px; color: var(--slate); font-weight: 600; text-align: right; }
   .dist-bar-bg { flex-grow: 1; height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
-  .dist-bar-fill { height: 100%; background: var(--teal-mid); border-radius: 6px; transition: width 0.8s ease-out; }
-  .dist-pct { width: 45px; text-align: right; font-weight: 700; color: var(--navy); }
+  .dist-bar-fill { height: 100%; background: var(--teal-mid); border-radius: 6px; transition: width 0.4s ease-out; }
+  .dist-pct { width: 45px; text-align: right; font-weight: 700; color: var(--navy); display: inline-block; min-width: 30px;}
   
   .feedback-list { display: flex; flex-direction: column; gap: 12px; }
   .feedback-item { background: var(--bg); border-left: 4px solid var(--teal); padding: 16px; border-radius: 4px; font-size: 14px; page-break-inside: avoid; }
   .feedback-meta { font-size: 12px; color: var(--slate); margin-bottom: 8px; font-weight: 600; display: flex; justify-content: space-between;}
   .feedback-q { font-weight: 700; color: var(--navy); margin-top: 8px; margin-bottom: 4px; font-size: 13px;}
   
+  /* 동적 막대 그래프 (라디오용) */
+  .bar-chart-item { margin-bottom: 12px; }
+  .bar-chart-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--navy);}
+  .bar-chart-track { background: var(--bg); border-radius: 4px; height: 24px; width: 100%; overflow: hidden; position: relative;}
+  .bar-chart-fill { background: var(--teal-mid); height: 100%; border-radius: 4px; transition: width 0.4s ease-out;}
+  
   .print-btn {
     background: var(--navy); color: white; border: none; padding: 8px 16px;
-    border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+    border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+
+  /* ================= 보고서 데이터 보정(편집) 모드 스타일 ================= */
+  .edit-mode .editable-field {
+    border: 1px dashed var(--teal);
+    background: rgba(10, 122, 110, 0.08) !important;
+    border-radius: 4px;
+    cursor: text;
+    padding: 2px 4px;
+  }
+  .edit-mode .editable-field:focus {
+    outline: 2px solid var(--teal);
+    background: #fff !important;
   }
 
   .footer-box { text-align: center; padding: 24px 16px; font-size: 12px; color: #6c757d; margin-top: 40px; border-top: 1px solid var(--border); }
@@ -233,9 +246,10 @@
   .spinner { width: 40px; height: 40px; border: 4px solid var(--teal-light); border-top: 4px solid var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+  /* ================= 인쇄(PDF) 최적화 (편집 모드 강제 숨김 포함) ================= */
   @media print {
     body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; }
-    .admin-nav, .primary-btn, .print-btn, .floating-add-btn { display: none !important; }
+    .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode { display: none !important; }
     .hero { background: white !important; color: black !important; padding: 20px 0 !important; border-bottom: 2px solid var(--navy); }
     .hero h1 { color: black !important; text-align: center; margin-bottom: 8px;}
     .hero p { color: black !important; text-align: center; max-width: 100%; margin-bottom: 0;}
@@ -254,6 +268,9 @@
     
     .feedback-item { border-left-color: #555 !important; background: #fff !important; border: 1px solid #ddd !important; margin-bottom: 12px;}
     .footer-box { margin-top: 30px; border-top: 1px solid #000; padding: 10px 0; font-size: 11px; text-align: center; color: #000 !important; display: block !important;}
+    
+    /* 인쇄 시 수정용 테두리 완벽 제거 */
+    .editable-field { border: none !important; background: transparent !important; padding: 0 !important; }
   }
 
   @media (max-width: 768px) {
@@ -310,21 +327,24 @@
     <button class="primary-btn" onclick="submitSurvey()">설문 제출하기</button>
   </div>
 
-  <!-- 3. 대시보드 뷰 (연수종료보고서 톤앤매너) -->
+  <!-- 3. 대시보드 뷰 (연수종료보고서 톤앤매너 + 데이터 보정 모드) -->
   <div id="viewDashboard" class="view-section">
     <div class="section-card card-header-offset">
-      <div class="section-title">
-        📊 만족도 종합 결과
-        <button class="print-btn" onclick="window.print()">🖨️ 보고서 PDF 인쇄</button>
+      <div class="section-title" style="flex-wrap: wrap; gap: 10px;">
+        <span>📊 만족도 종합 결과</span>
+        <div style="display: flex; gap: 8px;">
+          <button class="print-btn" id="btnEditMode" onclick="toggleEditMode()" style="background:var(--slate);">✏️ 데이터 보정</button>
+          <button class="print-btn" onclick="window.print()">🖨️ 보고서 PDF 인쇄</button>
+        </div>
       </div>
       <div class="stat-grid">
         <div class="stat-box">
           <h4>총 응답자 수</h4>
-          <div class="value" id="dTotalCount">0명</div>
+          <div class="value editable-field" id="dTotalCount">0명</div>
         </div>
         <div class="stat-box">
           <h4>전체 평균 만족도 (5점 척도 기준)</h4>
-          <div class="value" id="dTotalAvg">0.0점</div>
+          <div class="value editable-field" id="dTotalAvg">0.0점</div>
         </div>
       </div>
       
@@ -373,12 +393,12 @@
   const urlParams = new URLSearchParams(window.location.search);
   const isCustomerMode = urlParams.get('mode') === 'view'; 
   
-  // 연락처(q_contact)를 required: false 로 변경
+  // 초기 스키마
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
     questions: [
-      { id: "q_name", type: "text", title: "성명 및 소속", required: false },
+      { id: "q_name", type: "text", title: "성명 및 소속 (선택)", required: false },
       { id: "q_contact", type: "text", title: "연락처 (선택)", required: false },
       { id: "q_prep", type: "scale", title: "[사전준비] 안내 자료와 설명회 등 사전 준비 과정은 실질적인 도움이 되었습니까?", required: true },
       { id: "q_sch", type: "scale", title: "[일정구성] 방문지 구성과 체류 시간 등 전체적인 일정은 유익하고 적절했습니까?", required: true },
@@ -467,7 +487,6 @@
       });
     });
   } else {
-    // Firebase를 쓸 수 없는 환경(GitHub Pages 로컬 구동 등)일 때 Fallback
     loadConfigFromDB().then(() => {
       renderBuilder();
       uiHeroTitle.innerText = currentConfig.title;
@@ -477,7 +496,6 @@
 
   async function loadConfigFromDB() {
     try {
-      // 캔버스 환경 판별: __firebase_config 변수가 있으면 실제 클라우드 호출 시도
       if(db && typeof __firebase_config !== 'undefined') {
         const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
         const snap = await getDocs(collRef);
@@ -486,15 +504,10 @@
           return; 
         }
       }
-    } catch(e) { 
-      console.warn("DB 로드 실패, Local Storage Fallback 시도"); 
-    }
+    } catch(e) { console.warn("DB 로드 실패, Local Storage Fallback 시도"); }
 
-    // 깃허브 등 외부 환경용 로컬 스토리지 데이터 로드
     const localConf = localStorage.getItem('tm_survey_config');
-    if (localConf) {
-      currentConfig = JSON.parse(localConf);
-    }
+    if (localConf) currentConfig = JSON.parse(localConf);
   }
 
   function renderBuilder() {
@@ -508,7 +521,6 @@
       list.appendChild(createQuestionCard(q));
     });
 
-    // 렌더링 직후 모든 텍스트 영역 높이 일괄 조정
     setTimeout(() => {
       document.querySelectorAll('.auto-expand').forEach(adjustHeight);
     }, 50);
@@ -519,7 +531,6 @@
     const card = createQuestionCard(newQ);
     document.getElementById('bQuestionList').appendChild(card);
     
-    // 추가된 카드의 텍스트 영역 높이 조정
     setTimeout(() => {
       card.querySelectorAll('.auto-expand').forEach(adjustHeight);
     }, 10);
@@ -626,10 +637,9 @@
         if(snap.empty) await addDoc(collRef, currentConfig);
         else await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'survey_settings', snap.docs[0].id), currentConfig);
       } else {
-        throw new Error("Local Environment - Using LocalStorage");
+        throw new Error("Local Environment");
       }
     } catch(e) { 
-      // 권한 없음 에러(깃허브 등) 발생 시 로컬 스토리지에 안전하게 저장
       localStorage.setItem('tm_survey_config', JSON.stringify(currentConfig));
     }
 
@@ -652,9 +662,11 @@
       let extraDesc = '';
       const reqMark = q.required ? '<span class="q-required">*</span>' : '';
 
-      // 연락처 문항일 경우 심리적 안심 멘트 추가
+      if (q.id === 'q_name' || q.title.includes('성명') || q.title.includes('소속')) {
+        extraDesc = `<p style="color:var(--slate); font-size:13px; margin-top:-10px; margin-bottom:12px; line-height:1.4;">※ 철저한 익명성이 보장됩니다. 원치 않으시면 비워두셔도 좋습니다.</p>`;
+      }
       if (q.id === 'q_contact' || q.title.includes('연락처')) {
-        extraDesc = `<p style="color:var(--teal); font-size:13px; margin-top:-10px; margin-bottom:12px; line-height:1.4;">※ 연락처는 우수 의견 선정 및 모바일 기프티콘 발송 시에만 활용되며 행사 종료 후 안전하게 파기됩니다. 원치 않으시면 비워두셔도 좋습니다.</p>`;
+        extraDesc = `<p style="color:var(--teal); font-size:13px; margin-top:-10px; margin-bottom:12px; line-height:1.4;">※ 연락처는 우수 의견 선정 및 모바일 기프티콘 발송 시에만 활용되며 행사 종료 후 안전하게 파기됩니다.</p>`;
       }
 
       if (q.type === 'scale') {
@@ -727,10 +739,9 @@
       if(db && typeof __firebase_config !== 'undefined') {
         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'), payload);
       } else {
-        throw new Error("Local Environment - Using LocalStorage");
+        throw new Error("Local Environment");
       }
     } catch(e) { 
-      // 깃허브 등 권한 문제 발생 시 브라우저 내부 저장소 활용 (테스트 목적)
       const localData = JSON.parse(localStorage.getItem('tm_survey_responses') || '[]');
       localData.push(payload);
       localStorage.setItem('tm_survey_responses', JSON.stringify(localData));
@@ -742,8 +753,58 @@
     showLoading(false);
   };
 
+  /* =========================================================
+     [신규] 보고서 데이터 보정(수정) 모드 관련 로직
+     ========================================================= */
+  window.isEditMode = false;
+  window.toggleEditMode = function() {
+    window.isEditMode = !window.isEditMode;
+    const dashboard = document.getElementById('viewDashboard');
+    const btn = document.getElementById('btnEditMode');
+
+    if (window.isEditMode) {
+      dashboard.classList.add('edit-mode');
+      btn.innerHTML = '✅ 보정 완료';
+      btn.style.background = 'var(--teal)';
+      document.querySelectorAll('.editable-field').forEach(el => el.setAttribute('contenteditable', 'true'));
+      alert('보고서 보정 모드가 켜졌습니다.\n점수, 퍼센트(%), 피드백 텍스트를 클릭하여 자유롭게 수정하세요.\n퍼센트를 수정하면 막대그래프 길이도 자동 조절됩니다.');
+    } else {
+      dashboard.classList.remove('edit-mode');
+      btn.innerHTML = '✏️ 데이터 보정';
+      btn.style.background = 'var(--slate)';
+      document.querySelectorAll('.editable-field').forEach(el => el.setAttribute('contenteditable', 'false'));
+    }
+  };
+
+  // 막대 그래프 실시간 연동 이벤트
+  document.addEventListener('input', function(e) {
+    if (e.target.classList && e.target.classList.contains('editable-dist')) {
+      const match = e.target.innerText.match(/(\d+)/);
+      let val = match ? parseInt(match[1]) : 0;
+      if(val > 100) val = 100;
+      const bar = e.target.closest('.dist-row').querySelector('.dist-bar-fill');
+      if(bar) bar.style.width = val + '%';
+    }
+    if (e.target.classList && e.target.classList.contains('editable-radio-dist')) {
+      const match = e.target.innerText.match(/(\d+)/);
+      let val = match ? parseInt(match[1]) : 0;
+      if(val > 100) val = 100;
+      const bar = e.target.closest('.bar-chart-item').querySelector('.bar-chart-fill');
+      if(bar) bar.style.width = val + '%';
+    }
+  });
+
+
   async function fetchAndRenderDashboard() {
     showLoading(true);
+    // 탭 이동 시 수정 모드 초기화
+    window.isEditMode = false;
+    document.getElementById('viewDashboard').classList.remove('edit-mode');
+    const btnEdit = document.getElementById('btnEditMode');
+    if(btnEdit) {
+      btnEdit.innerHTML = '✏️ 데이터 보정';
+      btnEdit.style.background = 'var(--slate)';
+    }
     
     let responses = [];
     try {
@@ -751,14 +812,14 @@
         const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'));
         snap.forEach(doc => responses.push(doc.data()));
       } else {
-        throw new Error("Local Environment - Using LocalStorage");
+        throw new Error("Local Environment");
       }
     } catch(e) { 
-      // 권한 에러 시 로컬 저장소에서 데이터 불러오기
       responses = JSON.parse(localStorage.getItem('tm_survey_responses') || '[]');
     }
 
     const count = responses.length;
+    // 총 응답자 수 보정 가능 처리
     document.getElementById('dTotalCount').innerText = `${count}명`;
     const fbList = document.getElementById('dFeedbackList');
     const otherStats = document.getElementById('dOtherStatsContainer');
@@ -778,7 +839,7 @@
     const radioQs = currentConfig.questions.filter(q => q.type === 'radio');
     const textQs = currentConfig.questions.filter(q => q.type === 'text' || q.type === 'textarea');
 
-    // 1. Scale 통계 (PDF 보고서 톤앤매너 완벽 반영 - 상세 분포 막대)
+    // 1. Scale 통계
     if (scaleQs.length > 0) {
       let grandTotal = 0;
       let detailedHTML = '';
@@ -798,7 +859,6 @@
         const avg = validCount > 0 ? (sum / validCount) : 0;
         grandTotal += avg;
 
-        // 분포도 막대 HTML 생성
         let distRowsHTML = '';
         for(let i=5; i>=1; i--) {
           const pct = validCount > 0 ? Math.round((dist[i] / validCount) * 100) : 0;
@@ -806,7 +866,7 @@
             <div class="dist-row">
               <span class="dist-label">${i}점</span>
               <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${pct}%"></div></div>
-              <span class="dist-pct">${pct}%</span>
+              <span class="dist-pct editable-field editable-dist" contenteditable="false">${pct}%</span>
             </div>
           `;
         }
@@ -816,7 +876,7 @@
             <div class="report-q-title">${idx + 1}. ${q.title}</div>
             <div class="report-body">
               <div class="report-avg">
-                <div class="num">${avg.toFixed(1)}</div>
+                <div class="num editable-field" contenteditable="false">${avg.toFixed(1)}</div>
                 <div class="txt">평균 점수</div>
               </div>
               <div class="report-dist">
@@ -851,7 +911,7 @@
         const percent = answeredCount > 0 ? Math.round((val / answeredCount) * 100) : 0;
         barsHTML += `
           <div class="bar-chart-item">
-            <div class="bar-chart-label"><span>${opt}</span><span>${percent}% (${val}명)</span></div>
+            <div class="bar-chart-label"><span>${opt}</span><span class="editable-field editable-radio-dist" contenteditable="false">${percent}% (${val}명)</span></div>
             <div class="bar-chart-track"><div class="bar-chart-fill" style="width:${percent}%"></div></div>
           </div>
         `;
@@ -865,7 +925,7 @@
       `);
     });
 
-    // 3. 주관식 문항
+    // 3. 주관식 문항 (피드백 내용 보정 가능)
     responses.forEach(res => {
       let hasFb = false;
       let html = `<div class="feedback-meta"><span>📅 ${new Date(res.createdAt).toLocaleDateString()}</span></div>`;
@@ -873,7 +933,7 @@
       textQs.forEach(q => {
         if(res[q.id]) {
           hasFb = true;
-          html += `<div class="feedback-q">${q.title}</div><div style="white-space:pre-wrap;">${res[q.id]}</div>`;
+          html += `<div class="feedback-q">${q.title}</div><div class="editable-field" contenteditable="false" style="white-space:pre-wrap;">${res[q.id]}</div>`;
         }
       });
 
