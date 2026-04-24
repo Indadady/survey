@@ -8,7 +8,7 @@
 <!-- 카카오톡 등 SNS 공유 시 노출되는 썸네일 및 정보 (Open Graph) -->
 <meta property="og:title" content="스마트 설문조사 플랫폼 - 투어메이커">
 <meta property="og:description" content="참여하신 행사에 대한 소중한 의견을 남겨주세요.">
-<meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRefeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png">
+<meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png">
 <meta property="og:type" content="website">
 
 <!-- Google tag (gtag.js) -->
@@ -24,7 +24,8 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <!-- 폰트 적용 -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -41,6 +42,7 @@
     --border: #D0DDE6;
     --bg: #F4F7F6;
     --white: #FFFFFF;
+    --red: #E24B4A;
     --radius: 12px;
     --radius-sm: 8px;
     --nav-height: 60px;
@@ -52,90 +54,216 @@
     color: var(--text);
     line-height: 1.6;
     font-size: 15px;
-  }
-
-  /* ================= 관리자 네비게이션 ================= */
-  .admin-nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    height: var(--nav-height); background: var(--navy); color: white;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 20px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  .nav-brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .nav-tabs { display: flex; height: 100%; gap: 4px; }
-  .nav-tab {
-    background: transparent; color: rgba(255,255,255,0.7); border: none;
-    font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
-    padding: 0 20px; height: 100%; transition: all 0.2s; border-bottom: 3px solid transparent;
-  }
-  .nav-tab:hover { color: white; background: rgba(255,255,255,0.05); }
-  .nav-tab.active { color: white; border-bottom-color: var(--teal-mid); background: rgba(255,255,255,0.1); }
-  .share-btn {
-    background: var(--teal); color: white; border: none; padding: 8px 16px;
-    border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: background 0.2s;
-  }
-  .share-btn:hover { background: #086056; }
-
-  /* DB 상태 뱃지 */
-  .status-badge {
-    font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600; letter-spacing: -0.3px;
-    background: rgba(255,255,255,0.2); color: white; margin-left: 8px; border: 1px solid rgba(255,255,255,0.3);
+    word-break: keep-all;
   }
 
   body.admin-mode { padding-top: var(--nav-height); }
 
-  /* ================= 공통 레이아웃 ================= */
+  button, input, textarea, select { font-family: inherit; }
+
+  .admin-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-height);
+    background: var(--navy);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  .nav-brand {
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .status-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    margin-left: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  .nav-tabs { display: flex; height: 100%; gap: 4px; }
+
+  .nav-tab {
+    background: transparent;
+    color: rgba(255,255,255,0.72);
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0 20px;
+    height: 100%;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+  }
+
+  .nav-tab:hover { color: white; background: rgba(255,255,255,0.06); }
+  .nav-tab.active { color: white; border-bottom-color: var(--teal-mid); background: rgba(255,255,255,0.1); }
+
+  .share-btn {
+    background: var(--teal);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .share-btn:hover { background: #086056; }
+
   .hero {
     background: linear-gradient(135deg, var(--navy) 0%, #0A4A6E 60%, var(--teal) 100%);
-    color: white; padding: 60px 24px 40px; text-align: left; position: relative; overflow: hidden;
+    color: white;
+    padding: 60px 24px 40px;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
   }
-  .hero::before, .hero::after { content: ''; position: absolute; border-radius: 50%; }
-  .hero::before { top: -60px; right: -60px; width: 240px; height: 240px; background: rgba(255,255,255,0.04); }
-  .hero::after { bottom: -40px; left: -40px; width: 180px; height: 180px; background: rgba(10,122,110,0.2); }
 
-  .logo-container { position: absolute; top: 24px; left: 24px; z-index: 10; }
+  .hero::before,
+  .hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .hero::before {
+    top: -60px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .hero::after {
+    bottom: -40px;
+    left: -40px;
+    width: 180px;
+    height: 180px;
+    background: rgba(10,122,110,0.2);
+  }
+
+  .logo-container {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 10;
+  }
+
   .logo-container img { max-height: 24px; filter: brightness(0) invert(1); }
 
-  .hero h1 { font-size: clamp(24px, 5vw, 32px); font-weight: 700; margin-bottom: 12px; position: relative; z-index: 1; letter-spacing: -0.5px; }
-  .hero p { font-size: 15px; color: rgba(255,255,255,0.85); max-width: 560px; position: relative; z-index: 1; font-weight: 300; white-space: pre-wrap; }
-
-  .main { max-width: 800px; margin: 0 auto; padding: 0 16px 80px; }
-
-  .view-section { display: none; animation: fadeIn 0.3s ease; }
-  .view-section.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-  .section-card {
-    background: var(--white); border-radius: var(--radius); border: 1px solid var(--border);
-    padding: 28px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  .hero h1 {
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 800;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: -0.5px;
   }
+
+  .hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.88);
+    max-width: 680px;
+    position: relative;
+    z-index: 1;
+    font-weight: 300;
+    white-space: pre-wrap;
+  }
+
+  .main { max-width: 880px; margin: 0 auto; padding: 0 16px 80px; }
+
+  .view-section { display: none; animation: fadeIn 0.25s ease; }
+  .view-section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .section-card,
+  .q-block,
+  .builder-item,
+  .report-card,
+  .stat-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .section-card { padding: 28px; margin-top: 20px; }
   .card-header-offset { margin-top: -30px; position: relative; z-index: 10; border-top: 8px solid var(--teal); }
 
   .section-title {
-    font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 24px;
-    padding-bottom: 14px; border-bottom: 2px solid var(--teal-light);
-    display: flex; justify-content: space-between; align-items: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--teal-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
   }
 
-  /* ================= 1. 빌더(관리자) 뷰 전용 ================= */
   .builder-item {
-    background: var(--white); border: 1px solid var(--border); padding: 24px;
-    border-radius: var(--radius-sm); margin-bottom: 16px; position: relative;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    transition: all 0.2s;
     border-left: 4px solid transparent;
   }
-  .builder-item:hover, .builder-item:focus-within { border-left-color: var(--teal); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+  .builder-item:hover,
+  .builder-item:focus-within { border-left-color: var(--teal); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+  .builder-item-fixed { border-left: 4px solid var(--teal-mid) !important; }
 
   .b-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
-  .b-input {
-    width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px;
-    font-family: inherit; font-size: 15px; background: #fdfdfd; transition: border 0.2s;
-  }
-  .b-input:focus { border-bottom: 2px solid var(--teal); outline: none; background: #fff; }
-  .b-input.title-input { font-size: 16px; font-weight: 600; }
 
+  .b-label {
+    display: block;
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .b-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 15px;
+    background: #fdfdfd;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  .b-input:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(10,122,110,0.08);
+    outline: none;
+    background: #fff;
+  }
+
+  .b-input.title-input { font-size: 16px; font-weight: 700; }
   .auto-expand { resize: none; overflow: hidden; line-height: 1.5; }
-  select.b-input { width: 180px; flex-shrink: 0; cursor: pointer; }
+  select.b-input { width: 190px; flex-shrink: 0; cursor: pointer; }
 
   .b-options-container { margin-left: 8px; margin-bottom: 16px; }
   .b-option-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -143,43 +271,77 @@
   .b-option-input { flex-grow: 1; border: none; border-bottom: 1px solid var(--border); padding: 8px; font-size: 14px; outline: none; }
   .b-option-input:focus { border-bottom-color: var(--teal); }
   .b-btn-del-opt { background: transparent; border: none; color: var(--slate); font-size: 18px; cursor: pointer; }
-  .b-btn-add-opt { background: transparent; border: none; color: var(--teal); font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px; margin-top: 4px; }
+  .b-btn-add-opt { background: transparent; border: none; color: var(--teal); font-size: 14px; font-weight: 700; cursor: pointer; padding: 8px; margin-top: 4px; }
 
   .b-footer { display: flex; justify-content: flex-end; align-items: center; gap: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
-  .b-required-toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate); cursor: pointer; }
-  .b-required-toggle input { accent-color: var(--teal); width: 16px; height: 16px; cursor: pointer; }
 
-  .btn-remove-card { background: transparent; color: #c62828; border: none; font-size: 14px; font-weight: 600; cursor: pointer; padding: 8px; }
+  .b-required-toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate); cursor: pointer; }
+  .b-required-toggle input { accent-color: var(--teal); width: 17px; height: 17px; cursor: pointer; }
+
+  .btn-remove-card { background: transparent; color: #c62828; border: none; font-size: 14px; font-weight: 700; cursor: pointer; padding: 8px; }
   .btn-remove-card:hover { background: #ffebee; border-radius: 4px; }
 
-  /* 빌더 상단 고정 블록들 (질문 아님) */
-  .builder-item-fixed { border-left: 4px solid var(--teal-mid) !important; }
-  .builder-item-fixed:hover, .builder-item-fixed:focus-within { border-left-color: var(--teal-mid) !important; }
-
   .floating-add-btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%; background: var(--white); color: var(--teal); border: 2px dashed var(--teal-mid);
-    padding: 16px; border-radius: var(--radius-sm); font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--white);
+    color: var(--teal);
+    border: 2px dashed var(--teal-mid);
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
   }
+
   .floating-add-btn:hover { background: var(--teal-light); border-color: var(--teal); }
 
-  /* ================= 2. 폼(고객 참여) 뷰 전용 ================= */
-  .q-block { background: var(--white); border: 1px solid var(--border); padding: 28px; border-radius: var(--radius-sm); margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: border 0.3s; }
-  .q-block.header-block { border-top: 8px solid var(--navy); margin-top: -30px; position: relative; z-index: 10; }
-  .q-label { display: block; font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
-  .q-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 16px; white-space: pre-wrap; }
-  .q-required { color: #E24B4A; margin-left: 3px; font-weight: bold; }
-
-  /* 고객 편의를 위해 UI는 5점 척도 유지 */
-  .scale-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  .scale-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--slate); margin: 0 5px 8px 0; font-weight: 500; }
-  .scale-option label {
-    display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
-    padding: 14px 4px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-    font-size: 14px; font-weight: 500; color: var(--text-sub); transition: all 0.15s; background: var(--bg);
+  .notice-box {
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--teal-light);
+    color: var(--navy);
+    font-size: 13px;
+    border: 1px solid rgba(10,122,110,0.18);
+    line-height: 1.6;
   }
+
+  /* ================= 2. 폼(고객 참여) 뷰 전용 (5점 척도 유지) ================= */
+  .q-block {
+    padding: 28px;
+    margin-bottom: 16px;
+    transition: border 0.3s;
+  }
+
+  .q-block.header-block { border-top: 8px solid var(--navy); margin-top: -30px; position: relative; z-index: 10; }
+  .q-label { display: block; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+  .q-required { color: var(--red); margin-left: 3px; font-weight: 800; }
+  .q-helper { color: var(--slate); font-size: 13px; margin-top: -8px; margin-bottom: 12px; line-height: 1.5; }
+
+  .scale-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--slate); margin: 0 5px 8px 0; font-weight: 600; }
+  .scale-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .scale-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 14px 4px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-sub);
+    transition: all 0.15s;
+    background: var(--bg);
+  }
+
   .scale-option input[type="radio"] { accent-color: var(--teal); width: 18px; height: 18px; }
-  .scale-option label.selected { background: var(--teal-light); border-color: var(--teal); color: var(--teal); font-weight: 700; }
+  .scale-option label.selected { background: var(--teal-light); border-color: var(--teal); color: var(--teal); font-weight: 800; }
 
   .radio-list { display: flex; flex-direction: column; gap: 12px; }
   .radio-item label { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; padding: 8px; border-radius: 4px; transition: background 0.2s; }
@@ -187,100 +349,162 @@
   .radio-item input[type="radio"] { accent-color: var(--teal); width: 18px; height: 18px; cursor: pointer; }
 
   .text-input {
-    width: 100%; padding: 12px 14px; border: none; border-bottom: 1px solid var(--slate);
-    font-family: inherit; font-size: 15px; outline: none; transition: border-color 0.2s; background: transparent;
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    border-bottom: 1px solid var(--slate);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s;
+    background: transparent;
   }
+
   .text-input:focus { border-bottom: 2px solid var(--teal); }
-  textarea.text-input { resize: vertical; min-height: 80px; border: 1px solid var(--border); border-radius: 4px; padding: 14px; background: #fff; }
+  textarea.text-input { resize: vertical; min-height: 96px; border: 1px solid var(--border); border-radius: 6px; padding: 14px; background: #fff; }
   textarea.text-input:focus { border: 1px solid var(--teal); box-shadow: 0 0 0 3px rgba(10,122,110,0.1); }
 
   .primary-btn {
-    width: 100%; padding: 16px; background: var(--teal); color: white; border: none;
-    border-radius: var(--radius); font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 24px; transition: background 0.2s;
+    width: 100%;
+    padding: 16px;
+    background: var(--teal);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: background 0.2s;
   }
+
   .primary-btn:hover { background: var(--navy); }
 
-  /* ================= 3. 보고서 대시보드 전용 (2단 레이아웃) ================= */
+  /* ================= 3. 보고서 대시보드 전용 (10점 환산 및 2단 최적화) ================= */
   .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-  .stat-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; text-align: center; }
-  .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 600; }
+  .stat-box { padding: 20px; text-align: center; }
+  .stat-box h4 { font-size: 14px; color: var(--teal); margin-bottom: 8px; font-weight: 700; }
   .stat-box .value { font-size: 32px; font-weight: 800; color: var(--navy); }
 
-  /* 2단 그리드 레이아웃 적용 */
-  #dDetailedStatsContainer, #dOtherStatsContainer { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  #dOtherStatsContainer { margin-top: 16px; }
-  #dOtherStatsContainer .section-card { margin-top: 0; margin-bottom: 0; height: 100%; display: flex; flex-direction: column; }
+  #dDetailedStatsContainer,
+  #dOtherStatsContainer { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 
-  .report-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); page-break-inside: avoid; break-inside: avoid; height: 100%; display: flex; flex-direction: column; }
-  .report-q-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 16px; line-height: 1.4; }
+  #dOtherStatsContainer { margin-top: 16px; }
+  #dOtherStatsContainer .section-card { margin-top: 0; height: 100%; display: flex; flex-direction: column; }
+
+  .report-card { padding: 24px; page-break-inside: avoid; break-inside: avoid; height: 100%; display: flex; flex-direction: column; }
+  .report-q-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 16px; line-height: 1.45; }
   .report-body { display: flex; gap: 16px; align-items: center; flex-grow: 1; }
 
-  .report-avg { flex-shrink: 0; width: 100px; text-align: center; background: var(--teal-light); padding: 18px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.1); }
+  .report-avg { flex-shrink: 0; width: 100px; text-align: center; background: var(--teal-light); padding: 18px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(10,122,110,0.12); }
   .report-avg .num { font-size: 28px; font-weight: 800; color: var(--teal); line-height: 1; display: inline-block; min-width: 50px; }
-  .report-avg .txt { font-size: 12px; color: var(--navy); margin-top: 8px; font-weight: 600; }
+  .report-avg .txt { font-size: 12px; color: var(--navy); margin-top: 8px; font-weight: 700; }
 
-  /* 5개 막대그래프로 최적화된 간격 */
-  .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; } 
+  .report-dist { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
   .dist-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
-  .dist-label { width: 30px; color: var(--slate); font-weight: 600; text-align: right; }
+  .dist-label { width: 30px; color: var(--slate); font-weight: 700; text-align: right; }
   .dist-bar-bg { flex-grow: 1; height: 10px; background: var(--bg); border-radius: 5px; overflow: hidden; }
   .dist-bar-fill { height: 100%; background: var(--teal-mid); border-radius: 5px; transition: width 0.4s ease-out; }
-  .dist-pct { width: 40px; text-align: right; font-weight: 700; color: var(--navy); display: inline-block; min-width: 30px; }
+  .dist-pct { width: 42px; text-align: right; font-weight: 800; color: var(--navy); display: inline-block; min-width: 30px; }
 
-  .feedback-list { display: flex; flex-direction: column; gap: 12px; }
-  .feedback-item { background: var(--bg); border-left: 4px solid var(--teal); padding: 16px; border-radius: 4px; font-size: 14px; page-break-inside: avoid; break-inside: avoid;}
-  .feedback-meta { font-size: 12px; color: var(--slate); margin-bottom: 8px; font-weight: 600; display: flex; justify-content: space-between; }
-  .feedback-q { font-weight: 700; color: var(--navy); margin-top: 8px; margin-bottom: 4px; font-size: 13px; }
-
+  .feedback-list { display: flex; flex-direction: column; gap: 18px; }
+  .feedback-question-group { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; page-break-inside: avoid; break-inside: avoid; }
+  .feedback-question-title { font-size: 15px; font-weight: 800; color: var(--navy); padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--teal-light); line-height: 1.5; }
+  .feedback-answer-list { display: flex; flex-direction: column; gap: 10px; }
+  .feedback-item { background: var(--bg); border-left: 4px solid var(--teal); padding: 14px 16px; border-radius: 6px; font-size: 14px; page-break-inside: avoid; break-inside: avoid; }
+  .feedback-meta { font-size: 12px; color: var(--slate); margin-bottom: 8px; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .feedback-text { white-space: pre-wrap; line-height: 1.75; color: var(--text); }
+  
   .bar-chart-item { margin-bottom: 12px; }
-  .bar-chart-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--navy); }
+  .bar-chart-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--navy); gap: 12px; }
   .bar-chart-track { background: var(--bg); border-radius: 4px; height: 24px; width: 100%; overflow: hidden; position: relative; }
   .bar-chart-fill { background: var(--teal-mid); height: 100%; border-radius: 4px; transition: width 0.4s ease-out; }
 
   .print-btn {
-    background: var(--navy); color: white; border: none; padding: 8px 16px;
-    border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
   }
-  .btn-danger { background: rgba(226, 75, 74, 0.1); color: #E24B4A; border: 1px solid #E24B4A; }
-  .btn-danger:hover { background: #E24B4A; color: white; }
 
-  /* ================= ⏱️ 타임라인 스타일 ================= */
+  .print-btn:hover { filter: brightness(0.96); }
+  .btn-danger { background: rgba(226, 75, 74, 0.1); color: var(--red); border: 1px solid var(--red); }
+  .btn-danger:hover { background: var(--red); color: white; }
+
   .dist-badge {
-    display: inline-block; background: var(--teal-light); color: var(--teal); 
-    padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
-    margin-left: auto; border: 1px solid var(--teal-mid);
+    display: inline-block;
+    background: var(--teal-light);
+    color: var(--teal);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 800;
+    border: 1px solid var(--teal-mid);
+    white-space: nowrap;
   }
+
   .timeline-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); }
-  .timeline-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .timeline-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); gap: 16px; }
   .timeline-item:last-child { border-bottom: none; }
-  .timeline-item .name { font-weight: 600; color: var(--navy); font-size: 14px; display: flex; align-items: center; gap: 8px; }
-  .timeline-item .time { font-size: 13px; color: var(--slate); font-weight: 500; }
-  .badge-new { background: #e74c3c; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+  .timeline-item .name { font-weight: 700; color: var(--navy); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .timeline-item .time { font-size: 13px; color: var(--slate); font-weight: 600; white-space: nowrap; }
+  .badge-new { background: #e74c3c; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 800; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.55; } 100% { opacity: 1; } }
 
   /* ================= 보고서 데이터 보정(편집) 모드 스타일 ================= */
   .edit-mode .editable-field {
     border: 1px dashed var(--teal);
-    background: rgba(10, 122, 110, 0.08) !important;
+    background: rgba(10,122,110,0.08) !important;
     border-radius: 4px;
     cursor: text;
     padding: 2px 4px;
   }
-  .edit-mode .editable-field:focus {
-    outline: 2px solid var(--teal);
-    background: #fff !important;
+
+  .edit-mode .editable-field:focus { outline: 2px solid var(--teal); background: #fff !important; }
+
+  #toastBox {
+    position: fixed;
+    bottom: -140px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 58, 92, 0.96);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.24);
+    z-index: 9999;
+    transition: bottom 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    white-space: pre-wrap;
+    text-align: center;
+    width: max-content;
+    max-width: 90vw;
   }
 
-  /* ================= 커스텀 팝업 (Toast) ================= */
-  #toastBox {
-    position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
-    background: rgba(26, 58, 92, 0.95); color: white; padding: 14px 24px;
-    border-radius: 30px; font-size: 14px; font-weight: 500;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 9999;
-    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    white-space: pre-wrap; text-align: center; width: max-content; max-width: 90vw;
-  }
   #toastBox.show { bottom: 30px; }
+
+  #loadingOverlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.9);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    font-weight: 800;
+    color: var(--teal);
+    font-size: 18px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .spinner { width: 40px; height: 40px; border: 4px solid var(--teal-light); border-top: 4px solid var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
   @keyframes popIn {
     0% { transform: scale(0); opacity: 0; }
@@ -289,97 +513,98 @@
   }
   .complete-icon { animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-  .footer-box { text-align: center; padding: 24px 16px; font-size: 12px; color: #6c757d; margin-top: 40px; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .footer-box a { color: #6c757d; text-decoration: none; font-weight: bold; }
+  .footer-box {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .footer-box a { color: #6c757d; text-decoration: none; font-weight: 800; }
   .print-footer-logo { display: none; }
 
-  #loadingOverlay {
-    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255,255,255,0.9); z-index: 2000; justify-content: center; align-items: center;
-    font-weight: 700; color: var(--teal); font-size: 18px; flex-direction: column; gap: 12px;
-  }
-  .spinner { width: 40px; height: 40px; border: 4px solid var(--teal-light); border-top: 4px solid var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-  /* ================= 인쇄(PDF) 2단 레이아웃 완벽 최적화 ================= */
-  @media print {
-    @page { size: A4 portrait; margin: 15mm 10mm; } /* A4 규격 및 여백 최소화 */
-    body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; word-break: keep-all; font-size: 11pt; }
-    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } /* 색상 강제 인쇄 */
-
-    .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode, #toastBox { display: none !important; }
-    .hero { background: white !important; color: black !important; padding: 15px 0 !important; border-bottom: 2px solid var(--navy); }
-    .hero h1 { color: black !important; text-align: center; margin-bottom: 8px; font-size: 24px !important; }
-    .hero p { color: black !important; text-align: center; max-width: 100%; margin-bottom: 0; font-size: 12px !important; }
-    .hero::before, .hero::after { display: none !important; }
-    .logo-container { display: none !important; }
-    .main { max-width: 100% !important; padding: 0 !important; }
-    
-    /* 2단 그리드 강제 유지 및 여백 축소 */
-    #dDetailedStatsContainer, #dOtherStatsContainer { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-    #dOtherStatsContainer { margin-top: 10px !important; }
-    
-    .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 15px 0 5px 0 !important; }
-    .section-title { font-size: 14pt !important; margin-bottom: 15px !important; padding-bottom: 8px !important; }
-    
-    /* 데이터 박스 인쇄 핏 압축 */
-    .report-card, #dOtherStatsContainer .section-card { 
-        border: 1px solid #ddd !important; box-shadow: none !important; 
-        padding: 12px !important; margin-bottom: 0 !important; 
-        page-break-inside: avoid !important; break-inside: avoid !important; 
-    }
-    .report-q-title { font-size: 11pt !important; margin-bottom: 12px !important; }
-    .report-avg { padding: 12px 6px !important; width: 80px !important; border: 1px solid #ddd !important; background: #fafafa !important; }
-    .report-avg .num { font-size: 24px !important; }
-    .report-avg .txt { font-size: 10px !important; }
-    
-    /* 막대그래프 5개 최적화 */
-    .report-dist { gap: 4px !important; }
-    .dist-row { font-size: 9.5pt !important; gap: 6px !important; }
-    .dist-bar-bg { background: #eee !important; height: 8px !important; }
-    .dist-bar-fill { background: #555 !important; }
-    .dist-label { width: 28px !important; }
-    
-    .feedback-item { border-left-color: #555 !important; background: #fff !important; border: 1px solid #ddd !important; margin-bottom: 8px !important; padding: 10px !important; page-break-inside: avoid !important; break-inside: avoid !important; }
-    .footer-box { margin-top: 20px !important; border-top: 1px solid #000 !important; padding: 10px 0 5px 0 !important; font-size: 9pt !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: flex-end !important; color: #555 !important; text-align: left !important; }
-    .footer-box a { display: none !important; }
-    .print-footer-logo { display: block !important; max-height: 16px !important; filter: grayscale(100%); opacity: 0.8; }
-    .editable-field { border: none !important; background: transparent !important; padding: 0 !important; outline: none !important; }
-    .edit-mode .editable-field { border: none !important; background: transparent !important; }
-    .timeline-container { display: none !important; } /* 타임라인은 인쇄 제외 */
-  }
-
   @media (max-width: 768px) {
-    :root { --nav-height: 104px; }
+    :root { --nav-height: 108px; }
     .admin-nav { flex-wrap: wrap; padding: 12px 16px 0; justify-content: space-between; align-items: flex-start; }
-    .nav-brand { font-size: 14px; width: calc(100% - 100px); margin-top: 2px; }
+    .nav-brand { font-size: 14px; width: calc(100% - 110px); margin-top: 2px; }
     .status-badge { display: inline-block; margin-top: 4px; margin-left: 0; }
     .share-btn { padding: 6px 12px; font-size: 12px; margin-top: 0; }
-    
     .nav-tabs { display: flex; width: 100%; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start; }
-    .nav-tab { flex: 1; min-width: max-content; padding: 12px 16px; font-size: 13px; height: auto; border-bottom: 3px solid transparent; }
-    
-    /* 모바일에서는 1단 배치 */
-    #dDetailedStatsContainer, #dOtherStatsContainer { grid-template-columns: 1fr !important; }
-    
+    .nav-tab { flex: 1; min-width: max-content; padding: 12px 16px; font-size: 13px; height: auto; }
     .b-row { flex-direction: column; }
     select.b-input { width: 100%; }
-    .report-body { flex-direction: column; gap: 20px; align-items: stretch; }
+    .scale-options { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+    .scale-option label { padding: 12px 2px; }
+    .stat-grid, #dDetailedStatsContainer, #dOtherStatsContainer { grid-template-columns: 1fr !important; }
+    .report-body { flex-direction: column; gap: 18px; align-items: stretch; }
     .report-avg { width: 100%; display: flex; justify-content: center; align-items: baseline; gap: 8px; padding: 16px; }
     .report-avg .txt { margin-top: 0; }
-    .section-title { flex-direction: column; align-items: flex-start; gap: 10px;}
-    .dist-badge { margin-left: 0; }
-
+    .section-title { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .dist-badge { white-space: normal; }
     .builder-item-fixed > div > div:last-child { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
     .builder-item-fixed .print-btn { width: 100%; justify-content: center; text-align: center; }
     #viewDashboard > div:first-child > div:nth-child(2) { flex-direction: column; width: 100%; }
     #viewDashboard > div:first-child > div:nth-child(2) button { width: 100%; }
   }
+
+  /* ================= 인쇄(PDF) 2단 레이아웃 강제 유지 및 배경색 보존 ================= */
+  @media print {
+    @page { size: A4 portrait; margin: 15mm 10mm; }
+    body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; font-size: 11pt; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode, #toastBox, #loadingOverlay { display: none !important; }
+    .hero { background: white !important; color: black !important; padding: 15px 0 !important; border-bottom: 2px solid var(--navy) !important; }
+    .hero h1 { color: black !important; text-align: center; margin-bottom: 8px; font-size: 24px !important; }
+    .hero p { color: black !important; text-align: center; max-width: 100%; margin-bottom: 0; font-size: 12px !important; }
+    .hero::before, .hero::after, .logo-container { display: none !important; }
+    .main { max-width: 100% !important; padding: 0 !important; }
+
+    /* 2단 그리드 강제 유지 */
+    #dDetailedStatsContainer, #dOtherStatsContainer { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    #dOtherStatsContainer { margin-top: 10px !important; }
+
+    .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 15px 0 5px 0 !important; }
+    .section-title { font-size: 14pt !important; margin-bottom: 15px !important; padding-bottom: 8px !important; border-bottom: 2px solid var(--teal-light) !important; }
+    .report-card, #dOtherStatsContainer .section-card {
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+      padding: 12px !important;
+      margin-bottom: 0 !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    .report-q-title { font-size: 11pt !important; margin-bottom: 12px !important; color: var(--navy) !important; }
+    
+    /* 평균 점수 박스 배경색 및 스타일 강제 유지 */
+    .report-avg { padding: 12px 6px !important; width: 80px !important; border: 1px solid rgba(10,122,110,0.2) !important; background: var(--teal-light) !important; }
+    .report-avg .num { font-size: 24px !important; color: var(--teal) !important; }
+    .report-avg .txt { font-size: 10px !important; color: var(--navy) !important; }
+    
+    .report-dist { gap: 4px !important; }
+    .dist-row { font-size: 9.5pt !important; gap: 6px !important; }
+    .dist-bar-bg { background: #eee !important; height: 8px !important; }
+    .dist-bar-fill { background: var(--teal-mid) !important; }
+    .dist-label { width: 28px !important; }
+    .dist-pct { color: var(--navy) !important; }
+    
+    .feedback-question-group { border: 1px solid #ddd !important; background: #fff !important; padding: 12px !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+    .feedback-item { border-left: 4px solid var(--teal) !important; background: var(--bg) !important; margin-bottom: 8px !important; padding: 10px !important; }
+    .timeline-container { display: none !important; } /* 타임라인은 인쇄 제외 */
+    .footer-box { margin-top: 20px !important; border-top: 1px solid #000 !important; padding: 10px 0 5px 0 !important; font-size: 9pt !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: flex-end !important; color: #555 !important; text-align: left !important; }
+    .footer-box a { display: none !important; }
+    .print-footer-logo { display: block !important; max-height: 16px !important; filter: grayscale(100%); opacity: 0.8; }
+    .editable-field { border: none !important; background: transparent !important; padding: 0 !important; outline: none !important; }
+  }
 </style>
 </head>
 <body class="admin-mode" id="bodyEl">
 
-<!-- 글로벌 하단 팝업 (Alert 대체) -->
 <div id="toastBox"></div>
 <div id="loadingOverlay"><div class="spinner"></div><span id="loadingMsg">데이터 처리 중...</span></div>
 
@@ -390,7 +615,7 @@
   </div>
   <div class="nav-tabs" id="navTabs">
     <button class="nav-tab active" data-target="viewBuilder">📝 설문지 제작</button>
-    <button class="nav-tab" data-target="viewForm">🖥️ 고객 화면(미리보기)</button>
+    <button class="nav-tab" data-target="viewForm">🖥️ 고객 화면</button>
     <button class="nav-tab" data-target="viewDashboard">📊 연수 종료 보고서</button>
   </div>
   <button class="share-btn" onclick="copyShareLink()">🔗 배포 링크 복사</button>
@@ -407,14 +632,12 @@
 <div class="main">
   <!-- 1. 빌더 뷰 -->
   <div id="viewBuilder" class="view-section active">
-
-    <!-- 고정 블록: 행사 ID (버튼들을 위로 재배치) -->
     <div class="builder-item builder-item-fixed card-header-offset" id="bEventIdBlock" style="border-top: 8px solid var(--teal); background: var(--teal-light); border-color: var(--teal-mid); padding: 20px;">
       <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px;">
         <div style="flex-grow: 1;">
-          <label class="b-label" style="color:var(--navy); font-size:14px; font-weight:700;">🔑 행사 고유 코드 (Event ID)</label>
-          <p style="font-size:12px; color:var(--slate); margin-bottom:8px;">이 코드가 다르면 데이터가 섞이지 않습니다. 행사마다 고유코드를 생성하세요. (예: 260512_Osaka)</p>
-          <input type="text" class="b-input" id="bEventId" placeholder="예: 260512_Osaka" style="max-width: 300px; border-color: var(--teal-mid); font-weight: bold;">
+          <label class="b-label">🔑 행사 고유 코드 (Event ID)</label>
+          <p style="font-size:12px; color:var(--slate); margin-bottom:8px;">이 코드가 다르면 데이터가 섞이지 않습니다. 행사마다 고유코드를 생성하세요. 예: 260512_Osaka</p>
+          <input type="text" class="b-input" id="bEventId" placeholder="예: 260512_Osaka" style="max-width: 320px; border-color: var(--teal-mid); font-weight: bold;">
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button class="print-btn" onclick="loadEventData()" style="background:var(--slate); padding: 10px 16px;">🔄 불러오기</button>
@@ -423,16 +646,32 @@
       </div>
     </div>
 
-    <!-- 고정 블록: 제목 및 설명 -->
     <div class="builder-item builder-item-fixed" id="bTitleBlock">
-      <textarea class="b-input title-input auto-expand" id="bTitle" placeholder="설문지 제목" rows="1" style="border:none; border-bottom:1px solid var(--border); font-size:24px; padding:12px 0; font-weight:700;"></textarea>
+      <textarea class="b-input title-input auto-expand" id="bTitle" placeholder="설문지 제목" rows="1" style="border:none; border-bottom:1px solid var(--border); font-size:24px; padding:12px 0; font-weight:800;"></textarea>
       <textarea class="b-input auto-expand" id="bDesc" placeholder="설문지 설명 및 안내 문구" rows="1" style="border:none; padding:12px 0; min-height:60px; margin-top:8px;"></textarea>
     </div>
 
+    <!-- 개인정보 수집 설정 (기본값 꺼짐) -->
+    <div class="builder-item builder-item-fixed" id="bPrivacyBlock">
+      <div style="font-weight:800; color:var(--navy); margin-bottom:10px;">🔒 응답자 정보 수집 설정 (선택사항)</div>
+      <p style="font-size:13px; color:var(--slate); margin-bottom:14px; line-height:1.6;">
+        기본값은 완벽한 <b>익명 설문</b>입니다. 성명/소속 또는 연락처는 꼭 필요한 행사에서만 체크하여 노출하세요.<br>체크 시 고객 화면에서 필수 입력 항목으로 표시됩니다.
+      </p>
+      <label class="b-required-toggle" style="justify-content:flex-start; margin-bottom:8px;">
+        <input type="checkbox" id="bCollectIdentity">
+        <span>성명 및 소속 항목 노출</span>
+      </label>
+      <label class="b-required-toggle" style="justify-content:flex-start;">
+        <input type="checkbox" id="bCollectContact">
+        <span>연락처 항목 노출</span>
+      </label>
+      <div class="notice-box" style="margin-top:14px;">
+        익명성이 보장될수록 응답자는 행사 운영진의 눈치를 보지 않고 더 솔직하고 객관적으로 평가합니다.
+      </div>
+    </div>
+
     <div id="bQuestionList"></div>
-    <button class="floating-add-btn" onclick="addQuestionCard()">
-      <span style="font-size: 20px;">+</span> 새로운 문항 추가
-    </button>
+    <button class="floating-add-btn" onclick="addQuestionCard()"><span style="font-size:20px;">+</span> 새로운 문항 추가</button>
   </div>
 
   <!-- 2. 폼 뷰 -->
@@ -446,13 +685,11 @@
     <div class="section-card card-header-offset" style="border-top: 8px solid var(--navy);">
       <div class="section-title">
         <span>📊 만족도 종합 결과</span>
-        <div id="dDistBadge" class="dist-badge">최근 배포: 기록없음</div>
+        <div id="dDistBadge" class="dist-badge">최근 배포: 기록 없음</div>
       </div>
-      
-      <!-- 버튼 그룹을 아래로 분리하여 레이아웃 안정화 -->
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 20px;">
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
         <button class="print-btn btn-danger" onclick="resetSurveyData()">🗑️ 테스트 데이터 초기화</button>
-        <!-- ★ 데이터 보정 버튼 추가 -->
         <button class="print-btn" id="btnEditMode" onclick="toggleEditMode()" style="background:var(--slate);">✏️ 데이터 보정</button>
         <button class="print-btn" onclick="printReport()">🖨️ 보고서 PDF 인쇄</button>
       </div>
@@ -469,34 +706,30 @@
       </div>
       <div id="dDetailedStatsContainer"></div>
     </div>
+
     <div id="dOtherStatsContainer"></div>
-    
-    <!-- 응답 타임라인 -->
+
     <div class="section-card">
-      <div class="section-title">⏱️ 실시간 응답 타임라인 <span style="font-size:12px; color:var(--slate); font-weight:normal; margin-left:8px;">최근 응답순</span></div>
-      <div class="timeline-container" id="dTimelineList">
-        <!-- 타임라인 동적 추가 -->
-      </div>
+      <div class="section-title">⏱️ 실시간 응답 타임라인 <span style="font-size:12px; color:var(--slate); font-weight:600;">최근 응답순</span></div>
+      <div class="timeline-container" id="dTimelineList"></div>
     </div>
 
     <div class="section-card">
-      <div class="section-title">💬 주관식 의견 리스트</div>
+      <div class="section-title">💬 종합의견 및 제안사항</div>
       <div class="feedback-list" id="dFeedbackList"></div>
     </div>
   </div>
 
   <!-- 제출 완료 화면 -->
   <div id="viewComplete" class="view-section">
-    <div class="q-block header-block" style="text-align: center; padding: 60px 20px; border-top: 8px solid var(--teal);">
-      <div class="complete-icon" style="font-size: 64px; margin-bottom: 16px;">🎉</div>
-      <h2 id="completeMsgTitle" style="font-size: 24px; color: var(--navy); margin-bottom: 16px; font-weight: 700;">소중한 의견이 잘 전달되었습니다!</h2>
-      
-      <div style="background: var(--teal-light); padding: 20px; border-radius: var(--radius-sm); margin-bottom: 24px; display: inline-block; text-align: left; max-width: 400px;">
-        <p style="color: var(--navy); font-size: 15px; margin-bottom: 8px; font-weight: 600;">✅ 접수 완료</p>
-        <p style="color: var(--slate); font-size: 14px; line-height: 1.6; margin: 0;">보내주신 피드백은 성공적으로 수집되었으며, 다음 행사 준비 및 서비스 개선에 귀중한 자료로 활용하겠습니다.</p>
+    <div class="q-block header-block" style="text-align:center; padding:60px 20px; border-top:8px solid var(--teal);">
+      <div class="complete-icon" style="font-size:64px; margin-bottom:16px;">🎉</div>
+      <h2 id="completeMsgTitle" style="font-size:24px; color:var(--navy); margin-bottom:16px; font-weight:800;">소중한 의견이 잘 전달되었습니다!</h2>
+      <div style="background:var(--teal-light); padding:20px; border-radius:var(--radius-sm); margin-bottom:24px; display:inline-block; text-align:left; max-width:420px;">
+        <p style="color:var(--navy); font-size:15px; margin-bottom:8px; font-weight:800;">✅ 접수 완료</p>
+        <p style="color:var(--slate); font-size:14px; line-height:1.7; margin:0;">보내주신 피드백은 성공적으로 수집되었으며, 다음 행사 준비 및 서비스 개선에 귀중한 자료로 활용하겠습니다.</p>
       </div>
-
-      <p style="color: var(--navy); font-weight: 700; font-size: 16px;">함께해주셔서 대단히 감사합니다. ✈️</p>
+      <p style="color:var(--navy); font-weight:800; font-size:16px;">함께해주셔서 대단히 감사합니다. ✈️</p>
     </div>
   </div>
 
@@ -514,84 +747,16 @@
   import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  let toastTimeout;
-  window.showToast = function(msg) {
-    const toast = document.getElementById('toastBox');
-    toast.innerText = msg;
-    toast.classList.add('show');
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
-  };
-
-  function adjustHeight(el) {
-    el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
-  }
-
-  document.addEventListener('input', function(e) {
-    if (e.target.classList && e.target.classList.contains('auto-expand')) {
-      adjustHeight(e.target);
-    }
-  });
-
   const urlParams = new URLSearchParams(window.location.search);
   const isCustomerMode = urlParams.get('mode') === 'view';
-
   let currentEventId = urlParams.get('eventId') || '260512_Osaka';
 
-  // 기본 문항 5점 척도로 구성
-  let currentConfig = {
-    title: "행사/연수 만족도 조사",
-    desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
-    questions: [
-      { id: "q_name",    type: "text",     title: "성명 및 소속 (선택)",                                                               required: false },
-      { id: "q_contact", type: "text",     title: "연락처 (선택)",                                                                     required: false },
-      { id: "q_prep",    type: "scale",    title: "[사전준비] 안내 자료와 설명회 등 사전 준비 과정은 실질적인 도움이 되었습니까?",                       required: true  },
-      { id: "q_sch",     type: "scale",    title: "[일정구성] 방문지 구성과 체류 시간 등 전체적인 일정은 유익하고 적절했습니까?",                       required: true  },
-      { id: "q_op",      type: "scale",    title: "[콘텐츠·운영] 프로그램 내용과 행사 현장에서의 세심한 배려(운영)에 만족하십니까?",                    required: true  },
-      { id: "q_hotel",   type: "scale",    title: "[숙박] 이용하신 숙소는 청결하고 편안하게 휴식하기 좋았습니까?",                                      required: true  },
-      { id: "q_meal",    type: "scale",    title: "[식사] 제공된 식사는 현지의 특색을 느낄 수 있고 입맛에 맞았습니까?",                                  required: true  },
-      { id: "q_trans",   type: "scale",    title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?",                                      required: true  },
-      { id: "q_guide",   type: "scale",    title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?",                       required: true  },
-      { id: "q_total",   type: "scale",    title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?",                                      required: true  },
-      { id: "q_fb",      type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점이나 아쉬웠던 점을 자유롭게 적어주세요.",                       required: false },
-      { id: "q_idea",    type: "textarea", title: "[제안사항] 향후 기획될 행사에 적용해보고 싶은 새로운 아이디어나 제안 사항이 있다면 공유해주세요.",          required: false }
-    ],
-    lastDistributedAt: null
-  };
-
-  const uiHeroTitle = document.getElementById('uiHeroTitle');
-  const uiHeroDesc  = document.getElementById('uiHeroDesc');
-  const loadingOverlay = document.getElementById('loadingOverlay');
-
-  document.getElementById('bEventId').addEventListener('input', function() {
-    currentEventId = this.value.trim();
-  });
-
-  if (isCustomerMode) {
-    document.getElementById('adminNav').style.display = 'none';
-    document.getElementById('bodyEl').classList.remove('admin-mode');
-    switchTab('viewForm');
-  } else {
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        e.target.classList.add('active');
-        switchTab(e.target.dataset.target);
-      });
-    });
-  }
-
-  function switchTab(targetId) {
-    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
-    document.getElementById(targetId).classList.add('active');
-
-    if (targetId === 'viewBuilder')   renderBuilder();
-    if (targetId === 'viewForm')      renderForm();
-    if (targetId === 'viewDashboard') fetchAndRenderDashboard();
-  }
-
   let app, auth, db;
+  let isLocalMode = false;
+  let toastTimeout;
+  let cachedResponses = [];
+  window.isEditMode = false;
+
   const appId = typeof __app_id !== 'undefined' ? __app_id : 'tourmaker-survey-gform';
 
   const MY_FIREBASE_CONFIG = {
@@ -603,10 +768,109 @@
     appId: "1:261580642469:web:25b37070c76ab57aa2d54c",
     measurementId: "G-1XNBKXBZ0P"
   };
-  
-  let isLocalMode = false;
 
-  const updateStatusBadge = () => {
+  // 디폴트값: 성명/연락처 수집 OFF, 주관식 단일 문항 통합
+  let currentConfig = {
+    title: "행사/연수 만족도 조사",
+    desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
+    collectIdentity: false, 
+    collectContact: false,
+    questions: [
+      { id: "q_prep", type: "scale", title: "[사전준비] 안내 자료와 설명회 등 사전 준비 과정은 실질적인 도움이 되었습니까?", required: true },
+      { id: "q_sch", type: "scale", title: "[일정구성] 방문지 구성과 체류 시간 등 전체적인 일정은 유익하고 적절했습니까?", required: true },
+      { id: "q_op", type: "scale", title: "[콘텐츠·운영] 프로그램 내용과 행사 현장에서의 세심한 배려(운영)에 만족하십니까?", required: true },
+      { id: "q_hotel", type: "scale", title: "[숙박] 이용하신 숙소는 청결하고 편안하게 휴식하기 좋았습니까?", required: true },
+      { id: "q_meal", type: "scale", title: "[식사] 제공된 식사는 현지의 특색을 느낄 수 있고 입맛에 맞았습니까?", required: true },
+      { id: "q_trans", type: "scale", title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?", required: true },
+      { id: "q_guide", type: "scale", title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?", required: true },
+      { id: "q_total", type: "scale", title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?", required: true },
+      { id: "q_feedback", type: "textarea", title: "[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.", required: false }
+    ],
+    lastDistributedAt: null
+  };
+
+  const uiHeroTitle = document.getElementById('uiHeroTitle');
+  const uiHeroDesc = document.getElementById('uiHeroDesc');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+
+  function escapeHTML(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function adjustHeight(el) {
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }
+
+  function showLoading(show, msg = '데이터 처리 중...') {
+    document.getElementById('loadingMsg').innerText = msg;
+    loadingOverlay.style.display = show ? 'flex' : 'none';
+  }
+
+  window.showToast = function(msg) {
+    const toast = document.getElementById('toastBox');
+    toast.innerText = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
+  };
+
+  function normalizeConfig(rawConfig = {}) {
+    const merged = { ...currentConfig, ...rawConfig };
+    let questions = Array.isArray(merged.questions) ? merged.questions : [];
+
+    const identityQuestions = questions.filter(q => q.id === 'q_name' || String(q.title || '').includes('성명') || String(q.title || '').includes('소속'));
+    const contactQuestions = questions.filter(q => q.id === 'q_contact' || String(q.title || '').includes('연락처'));
+
+    if (typeof rawConfig.collectIdentity !== 'boolean') merged.collectIdentity = identityQuestions.length > 0 ? false : !!merged.collectIdentity;
+    if (typeof rawConfig.collectContact !== 'boolean') merged.collectContact = contactQuestions.length > 0 ? false : !!merged.collectContact;
+
+    questions = questions.filter(q => {
+      if (q.id === 'q_name' || q.id === 'q_contact') return false;
+      if (String(q.title || '').includes('성명') && String(q.title || '').includes('소속')) return false;
+      if (String(q.title || '').includes('연락처')) return false;
+      return true;
+    });
+
+    const hasUnifiedFeedback = questions.some(q => q.id === 'q_feedback');
+    const legacyFeedbacks = questions.filter(q => ['q_fb', 'q_idea'].includes(q.id));
+    if (!hasUnifiedFeedback && legacyFeedbacks.length > 0) {
+      questions = questions.filter(q => !['q_fb', 'q_idea'].includes(q.id));
+      questions.push({
+        id: 'q_feedback',
+        type: 'textarea',
+        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
+        required: false
+      });
+    }
+
+    if (!questions.some(q => q.id === 'q_feedback')) {
+      questions.push({
+        id: 'q_feedback',
+        type: 'textarea',
+        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
+        required: false
+      });
+    }
+
+    merged.questions = questions;
+    return merged;
+  }
+
+  function getConfigDocRef(eventId) {
+    return doc(db, 'artifacts', appId, 'public', 'data', 'config', eventId);
+  }
+
+  function getResponsesColRef(eventId) {
+    return collection(db, 'artifacts', appId, 'public', 'data', 'responses_' + eventId);
+  }
+
+  function updateStatusBadge() {
     const badge = document.getElementById('dbStatusBadge');
     if (!badge) return;
     if (!isLocalMode && db) {
@@ -620,35 +884,11 @@
       badge.style.color = '#ff6b6b';
       badge.style.borderColor = 'rgba(231, 76, 60, 0.4)';
     }
-  };
-
-  try {
-    let configToUse = null;
-    if (MY_FIREBASE_CONFIG) {
-      configToUse = MY_FIREBASE_CONFIG;
-    } else if (typeof __firebase_config !== 'undefined') {
-      configToUse = JSON.parse(__firebase_config);
-    }
-
-    if (configToUse) {
-      app  = initializeApp(configToUse);
-      auth = getAuth(app);
-      db   = getFirestore(app);
-    } else {
-      isLocalMode = true;
-      console.warn("Firebase 설정이 없어 오프라인(Local Storage) 모드로 동작합니다.");
-    }
-    updateStatusBadge();
-  } catch (error) { 
-    isLocalMode = true;
-    updateStatusBadge();
-    console.error("Firebase Init Error:", error); 
   }
 
-  function showLoading(show) { loadingOverlay.style.display = show ? 'flex' : 'none'; }
-
-  const initAuth = async () => {
+  async function initAuth() {
     try {
+      if (!auth) return;
       if (MY_FIREBASE_CONFIG) {
         await signInAnonymously(auth);
       } else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -656,46 +896,74 @@
       } else {
         await signInAnonymously(auth);
       }
-    } catch (error) { 
-      console.error("Auth init failed:", error); 
+    } catch (error) {
+      console.error('Auth init failed:', error);
+      isLocalMode = true;
+      updateStatusBadge();
       if (error.code === 'auth/configuration-not-found') {
-        alert("⚠️ [Firebase 설정 필요]\n파이어베이스 콘솔의 왼쪽 [Authentication(인증)] 메뉴로 가셔서 화면 중앙의 '시작하기' 버튼을 누른 후, [익명] 제공업체를 켜주세요.");
-        isLocalMode = true;
-        updateStatusBadge();
-        loadConfigFromDB().then(() => {
-          renderBuilder();
-          uiHeroTitle.innerText = currentConfig.title;
-          uiHeroDesc.innerText  = currentConfig.desc;
-        });
+        alert('⚠️ Firebase Authentication 설정이 필요합니다.\nFirebase 콘솔 > Authentication > 익명 제공업체를 활성화해 주세요.');
       }
     }
-  };
+  }
 
-  if (auth) {
-    initAuth().then(() => {
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          await loadConfigFromDB();
-          uiHeroTitle.innerText = currentConfig.title;
-          uiHeroDesc.innerText  = currentConfig.desc;
-          if (isCustomerMode) switchTab('viewForm');
-          else switchTab('viewBuilder');
-        }
+  try {
+    let configToUse = null;
+    if (MY_FIREBASE_CONFIG) configToUse = MY_FIREBASE_CONFIG;
+    else if (typeof __firebase_config !== 'undefined') configToUse = JSON.parse(__firebase_config);
+
+    if (configToUse) {
+      app = initializeApp(configToUse);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    } else {
+      isLocalMode = true;
+      console.warn('Firebase 설정이 없어 LocalStorage 모드로 동작합니다.');
+    }
+  } catch (error) {
+    isLocalMode = true;
+    console.error('Firebase Init Error:', error);
+  }
+  updateStatusBadge();
+
+  document.addEventListener('input', function(e) {
+    if (e.target.classList && e.target.classList.contains('auto-expand')) adjustHeight(e.target);
+  });
+
+  document.getElementById('bEventId').addEventListener('input', function() {
+    currentEventId = this.value.trim();
+  });
+
+  if (isCustomerMode) {
+    document.getElementById('adminNav').style.display = 'none';
+    document.getElementById('bodyEl').classList.remove('admin-mode');
+  } else {
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        switchTab(e.currentTarget.dataset.target);
       });
     });
-  } else {
-    loadConfigFromDB().then(() => {
-      renderBuilder();
-      uiHeroTitle.innerText = currentConfig.title;
-      uiHeroDesc.innerText  = currentConfig.desc;
-    });
   }
 
-  function getConfigDocRef(eventId) {
-    return doc(db, 'artifacts', appId, 'public', 'data', 'config', eventId);
+  async function boot() {
+    if (auth) {
+      await initAuth();
+      onAuthStateChanged(auth, async (user) => {
+        if (user || isLocalMode) await finishInitialLoad();
+      });
+      if (isLocalMode) await finishInitialLoad();
+    } else {
+      await finishInitialLoad();
+    }
   }
-  function getResponsesColRef(eventId) {
-    return collection(db, 'artifacts', appId, 'public', 'data', 'responses_' + eventId);
+
+  async function finishInitialLoad() {
+    await loadConfigFromDB();
+    uiHeroTitle.innerText = currentConfig.title;
+    uiHeroDesc.innerText = currentConfig.desc;
+    if (isCustomerMode) switchTab('viewForm');
+    else switchTab('viewBuilder');
   }
 
   async function loadConfigFromDB() {
@@ -703,14 +971,74 @@
       if (!isLocalMode && db && auth && auth.currentUser) {
         const docSnap = await getDoc(getConfigDocRef(currentEventId));
         if (docSnap.exists()) {
-          currentConfig = Object.assign(currentConfig, docSnap.data());
+          currentConfig = normalizeConfig(docSnap.data());
           return;
         }
       }
-    } catch (e) { console.warn("DB 로드 실패, LocalStorage Fallback:", e); }
+    } catch (e) {
+      console.warn('DB 로드 실패, LocalStorage Fallback:', e);
+    }
 
     const localConf = localStorage.getItem(`tm_survey_config_${currentEventId}`);
-    if (localConf) currentConfig = Object.assign(currentConfig, JSON.parse(localConf));
+    if (localConf) currentConfig = normalizeConfig(JSON.parse(localConf));
+    else currentConfig = normalizeConfig(currentConfig);
+  }
+
+  function syncBuilderStateToConfig() {
+    if (isCustomerMode) return;
+
+    const titleEl = document.getElementById('bTitle');
+    const descEl = document.getElementById('bDesc');
+    const identityEl = document.getElementById('bCollectIdentity');
+    const contactEl = document.getElementById('bCollectContact');
+    const questionCards = document.querySelectorAll('#bQuestionList .builder-item');
+
+    if (!titleEl || !descEl || !identityEl || !contactEl) return;
+
+    currentConfig.title = titleEl.value.trim() || currentConfig.title || '행사/연수 만족도 조사';
+    currentConfig.desc = descEl.value.trim();
+    currentConfig.collectIdentity = identityEl.checked;
+    currentConfig.collectContact = contactEl.checked;
+
+    if (questionCards.length > 0) {
+      const liveQuestions = [];
+      questionCards.forEach(card => {
+        const typeEl = card.querySelector('.b-q-type');
+        const titleInput = card.querySelector('.b-q-title');
+        const requiredEl = card.querySelector('.b-q-required');
+        if (!typeEl || !titleInput || !requiredEl) return;
+
+        const q = {
+          id: card.dataset.id,
+          type: typeEl.value,
+          title: titleInput.value.trim() || '제목 없는 질문',
+          required: requiredEl.checked
+        };
+
+        if (q.type === 'radio') {
+          q.options = Array.from(card.querySelectorAll('.b-option-input'))
+            .map(inp => inp.value.trim())
+            .filter(Boolean);
+          if (q.options.length === 0) q.options = ['기본 옵션'];
+        }
+        liveQuestions.push(q);
+      });
+
+      if (liveQuestions.length > 0) currentConfig.questions = liveQuestions;
+    }
+  }
+
+  function switchTab(targetId) {
+    if (targetId !== 'viewBuilder') {
+      syncBuilderStateToConfig();
+    }
+
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(targetId).classList.add('active');
+
+    if (targetId === 'viewBuilder') renderBuilder();
+    if (targetId === 'viewForm') renderForm();
+    if (targetId === 'viewDashboard') fetchAndRenderDashboard();
   }
 
   window.loadEventData = async function() {
@@ -722,29 +1050,24 @@
     newUrl.searchParams.set('eventId', currentEventId);
     window.history.pushState({}, '', newUrl);
 
-    showLoading(true);
+    showLoading(true, '행사 설정 불러오는 중...');
     await loadConfigFromDB();
     renderBuilder();
     uiHeroTitle.innerText = currentConfig.title;
-    uiHeroDesc.innerText  = currentConfig.desc;
+    uiHeroDesc.innerText = currentConfig.desc;
     showLoading(false);
-    showToast(`[${currentEventId}] 행사 환경을 성공적으로 불러왔습니다.`);
+    showToast(`[${currentEventId}] 행사 환경을 불러왔습니다.`);
   };
 
   window.copyShareLink = async function() {
     const inputCode = document.getElementById('bEventId').value.trim();
     if (!inputCode) {
-      showToast("행사 고유 코드를 입력하고 [저장] 후 배포해 주세요.\n(예: 260512_Osaka)");
+      showToast('행사 고유 코드를 입력하고 [저장 및 업데이트] 후 배포해 주세요.');
       return;
     }
 
     if (isLocalMode) {
-      alert("⚠️ 시스템 경고 ⚠️\n현재 Firebase DB가 연결되지 않은 '로컬 모드'입니다.\n이 링크를 고객에게 보내도 데이터가 취합되지 않고 고객 스마트폰에만 저장됩니다.");
-    } else {
-      const testCount = document.getElementById('dTotalCount').innerText;
-      if(testCount === '0명') {
-        alert("💡 꿀팁: 링크 배포 전, 상단의 [🖥️ 고객 화면] 탭에서 직접 1회 제출하여 테스트 해보시는 것을 적극 권장합니다!");
-      }
+      alert('⚠️ 현재 로컬 테스트 모드입니다.\n이 링크를 고객에게 보내도 데이터가 서버에 취합되지 않을 수 있습니다.');
     }
 
     const url = new URL(window.location.href);
@@ -752,7 +1075,7 @@
     url.searchParams.set('eventId', inputCode);
     const longUrl = url.toString();
 
-    showLoading(true);
+    showLoading(true, '배포 링크 생성 중...');
     let shareUrl = longUrl;
 
     try {
@@ -762,7 +1085,7 @@
         if (short.startsWith('http')) shareUrl = short.trim();
       }
     } catch (e) {
-      console.warn("단축 URL 생성 실패, 원본 URL 사용:", e);
+      console.warn('단축 URL 생성 실패, 원본 URL 사용:', e);
     }
 
     const nowISO = new Date().toISOString();
@@ -773,15 +1096,16 @@
       } else {
         localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
       }
-      const dTimeStr = new Date(nowISO).toLocaleString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      document.getElementById('dDistBadge').innerText = `최근 배포: ${dTimeStr}`;
-    } catch (err) { console.warn('배포 시간 기록 실패:', err); }
+      renderDistributionBadge();
+    } catch (err) {
+      console.warn('배포 시간 기록 실패:', err);
+    }
 
     showLoading(false);
 
     try {
       await navigator.clipboard.writeText(shareUrl);
-      showToast(`[${inputCode}] 단축 링크가 복사되었습니다!\n(배포 시간이 기록되었습니다)`);
+      showToast(`[${inputCode}] 배포 링크가 복사되었습니다!\n배포 시간이 기록되었습니다.`);
     } catch (e) {
       const tmp = document.createElement('textarea');
       tmp.value = shareUrl;
@@ -791,22 +1115,22 @@
       tmp.select();
       document.execCommand('copy');
       document.body.removeChild(tmp);
-      showToast(`[${inputCode}] 단축 링크가 복사되었습니다!`);
+      showToast(`[${inputCode}] 배포 링크가 복사되었습니다!`);
     }
   };
 
   function renderBuilder() {
     document.getElementById('bEventId').value = currentEventId;
-    document.getElementById('bTitle').value   = currentConfig.title;
-    document.getElementById('bDesc').value    = currentConfig.desc;
+    document.getElementById('bTitle').value = currentConfig.title || '';
+    document.getElementById('bDesc').value = currentConfig.desc || '';
+    document.getElementById('bCollectIdentity').checked = !!currentConfig.collectIdentity;
+    document.getElementById('bCollectContact').checked = !!currentConfig.collectContact;
 
     const list = document.getElementById('bQuestionList');
     list.innerHTML = '';
     currentConfig.questions.forEach(q => list.appendChild(createQuestionCard(q)));
 
-    setTimeout(() => {
-      document.querySelectorAll('.auto-expand').forEach(adjustHeight);
-    }, 50);
+    setTimeout(() => document.querySelectorAll('.auto-expand').forEach(adjustHeight), 50);
   }
 
   window.addQuestionCard = function() {
@@ -822,18 +1146,17 @@
     card.dataset.id = q.id;
 
     const types = [
-      { val: 'scale',    txt: '5점 척도 (평가용)' }, /* 5점 척도로 표기 롤백 */
-      { val: 'radio',    txt: '객관식 (단일 선택)' },
-      { val: 'text',     txt: '단답형 텍스트' },
+      { val: 'scale', txt: '5점 척도 (평가용)' },
+      { val: 'radio', txt: '객관식 (단일 선택)' },
+      { val: 'text', txt: '단답형 텍스트' },
       { val: 'textarea', txt: '장문형 텍스트' }
     ];
-    const typeOptions = types.map(t =>
-      `<option value="${t.val}" ${q.type === t.val ? 'selected' : ''}>${t.txt}</option>`
-    ).join('');
+
+    const typeOptions = types.map(t => `<option value="${t.val}" ${q.type === t.val ? 'selected' : ''}>${t.txt}</option>`).join('');
 
     card.innerHTML = `
       <div class="b-row">
-        <textarea class="b-input title-input b-q-title auto-expand" rows="1" placeholder="질문을 입력하세요">${q.title}</textarea>
+        <textarea class="b-input title-input b-q-title auto-expand" rows="1" placeholder="질문을 입력하세요">${escapeHTML(q.title || '')}</textarea>
         <select class="b-input b-q-type">${typeOptions}</select>
       </div>
       <div class="b-options-container" style="display:none;"></div>
@@ -846,7 +1169,7 @@
       </div>
     `;
 
-    const typeSelect       = card.querySelector('.b-q-type');
+    const typeSelect = card.querySelector('.b-q-type');
     const optionsContainer = card.querySelector('.b-options-container');
 
     const renderOptionsUI = () => {
@@ -862,10 +1185,11 @@
       optionsContainer.innerHTML = '';
       optsToRender.forEach(opt => addOptionRow(optionsContainer, opt));
 
-      const addBtn    = document.createElement('button');
+      const addBtn = document.createElement('button');
       addBtn.className = 'b-btn-add-opt';
+      addBtn.type = 'button';
       addBtn.innerHTML = '+ 옵션 추가';
-      addBtn.onclick   = () => addOptionRow(optionsContainer, `옵션 ${optionsContainer.querySelectorAll('.b-option-row').length + 1}`);
+      addBtn.onclick = () => addOptionRow(optionsContainer, `옵션 ${optionsContainer.querySelectorAll('.b-option-row').length + 1}`);
       optionsContainer.appendChild(addBtn);
     };
 
@@ -878,8 +1202,8 @@
     const row = document.createElement('div');
     row.className = 'b-option-row';
     row.innerHTML = `
-      <input type="text" class="b-option-input" value="${val}" placeholder="옵션 내용">
-      <button class="b-btn-del-opt" onclick="this.parentElement.remove()">×</button>
+      <input type="text" class="b-option-input" value="${escapeHTML(val)}" placeholder="옵션 내용">
+      <button class="b-btn-del-opt" type="button" onclick="this.parentElement.remove()">×</button>
     `;
     container.insertBefore(row, container.lastElementChild);
   }
@@ -887,7 +1211,7 @@
   window.saveConfigData = async function() {
     const inputCode = document.getElementById('bEventId').value.trim();
     if (!inputCode) {
-      showToast("행사 고유 코드를 반드시 입력해 주세요.");
+      showToast('행사 고유 코드를 반드시 입력해 주세요.');
       document.getElementById('bEventId').focus();
       return;
     }
@@ -897,91 +1221,110 @@
     newUrl.searchParams.set('eventId', currentEventId);
     window.history.pushState({}, '', newUrl);
 
-    showLoading(true);
+    showLoading(true, '행사 설정 저장 중...');
 
     const newConfig = {
-      title: document.getElementById('bTitle').value.trim(),
-      desc:  document.getElementById('bDesc').value.trim(),
+      title: document.getElementById('bTitle').value.trim() || '행사/연수 만족도 조사',
+      desc: document.getElementById('bDesc').value.trim(),
+      collectIdentity: document.getElementById('bCollectIdentity')?.checked || false,
+      collectContact: document.getElementById('bCollectContact')?.checked || false,
       questions: [],
-      lastDistributedAt: currentConfig.lastDistributedAt
+      lastDistributedAt: currentConfig.lastDistributedAt || null
     };
 
-    document.querySelectorAll('#bQuestionList .builder-item:not(.builder-item-fixed)').forEach(card => {
+    document.querySelectorAll('#bQuestionList .builder-item').forEach(card => {
       const type = card.querySelector('.b-q-type').value;
       const q = {
-        id:       card.dataset.id,
-        type:     type,
-        title:    card.querySelector('.b-q-title').value.trim() || '제목 없는 질문',
+        id: card.dataset.id,
+        type,
+        title: card.querySelector('.b-q-title').value.trim() || '제목 없는 질문',
         required: card.querySelector('.b-q-required').checked
       };
 
       if (type === 'radio') {
-        q.options = Array.from(card.querySelectorAll('.b-option-input'))
-          .map(inp => inp.value.trim())
-          .filter(v => v);
+        q.options = Array.from(card.querySelectorAll('.b-option-input')).map(inp => inp.value.trim()).filter(Boolean);
         if (q.options.length === 0) q.options = ['기본 옵션'];
       }
       newConfig.questions.push(q);
     });
 
-    currentConfig = newConfig;
+    currentConfig = normalizeConfig(newConfig);
     uiHeroTitle.innerText = currentConfig.title;
-    uiHeroDesc.innerText  = currentConfig.desc;
+    uiHeroDesc.innerText = currentConfig.desc;
 
     try {
       if (!isLocalMode && db && auth && auth.currentUser) {
         await setDoc(getConfigDocRef(currentEventId), currentConfig);
-        showToast(`[${currentEventId}] 행사 설정이 서버에 성공적으로 저장되었습니다.\n우측 상단의 [🔗 배포 링크 복사]를 눌러 고객에게 전달하세요.`);
+        showToast(`[${currentEventId}] 행사 설정이 서버에 저장되었습니다.\n우측 상단의 [배포 링크 복사]를 눌러 전달하세요.`);
       } else {
-        throw new Error("DB 연결 없음 (Local Environment)");
+        throw new Error('DB 연결 없음');
       }
     } catch (e) {
       localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
-      showToast(`⚠️ [로컬 모드] 행사 설정이 스마트폰/PC 임시 저장소에 저장되었습니다.\n(서버 연동을 위해 소스코드를 확인해주세요)`);
+      showToast('⚠️ 로컬 모드로 저장되었습니다.\n서버 배포 전 Firebase 연결 상태를 확인해 주세요.');
     }
 
+    renderBuilder();
     showLoading(false);
   };
 
-  /* =========================================================
-     ★ 폼 렌더링 (고객 편의를 위해 5점 척도 UI로 롤백)
-  ========================================================= */
+  function getOptionalInfoQuestions() {
+    const optionalInfoQuestions = [];
+
+    if (currentConfig.collectIdentity) {
+      optionalInfoQuestions.push({
+        id: 'q_name',
+        type: 'text',
+        title: '성명 및 소속',
+        required: true,
+        helper: '※ 응답 확인 및 결과 정리를 위해 성명과 소속을 입력해 주세요.'
+      });
+    }
+
+    if (currentConfig.collectContact) {
+      optionalInfoQuestions.push({
+        id: 'q_contact',
+        type: 'text',
+        title: '연락처',
+        required: true,
+        helper: '※ 연락처는 응답 확인, 우수 의견 선정, 모바일 기프티콘 발송 등 필요한 경우에만 활용됩니다.'
+      });
+    }
+
+    return optionalInfoQuestions;
+  }
+
   function renderForm() {
     const container = document.getElementById('fFormContainer');
     container.innerHTML = `
       <div class="q-block header-block">
-        <h2 style="font-size:22px; margin-bottom:8px; color:var(--navy);">${currentConfig.title}</h2>
-        <p style="color:var(--text-sub); white-space:pre-wrap;">${currentConfig.desc}</p>
-        <p style="color:#E24B4A; font-size:13px; margin-top:16px;">* 필수항목</p>
+        <h2 style="font-size:22px; margin-bottom:8px; color:var(--navy);">${escapeHTML(currentConfig.title)}</h2>
+        <p style="color:var(--text-sub); white-space:pre-wrap;">${escapeHTML(currentConfig.desc)}</p>
+        <p style="color:var(--red); font-size:13px; margin-top:16px;">* 필수항목</p>
+        ${(!currentConfig.collectIdentity && !currentConfig.collectContact) ? '<p style="color:var(--teal); font-size:13px; margin-top:8px; font-weight:700;">본 설문은 철저한 익명으로 진행됩니다.</p>' : ''}
       </div>
     `;
 
-    currentConfig.questions.forEach((q) => {
-      let contentHTML = '';
-      let extraDesc   = '';
-      const reqMark   = q.required ? '<span class="q-required">*</span>' : '';
+    const formQuestions = [...getOptionalInfoQuestions(), ...currentConfig.questions];
 
-      if (q.id === 'q_name' || q.title.includes('성명') || q.title.includes('소속')) {
-        extraDesc = `<p style="color:var(--slate); font-size:13px; margin-top:-10px; margin-bottom:12px; line-height:1.4;">※ 철저한 익명성이 보장됩니다. 원치 않으시면 비워두셔도 좋습니다.</p>`;
-      }
-      if (q.id === 'q_contact' || q.title.includes('연락처')) {
-        extraDesc = `<p style="color:var(--teal); font-size:13px; margin-top:-10px; margin-bottom:12px; line-height:1.4;">※ 연락처는 우수 의견 선정 및 모바일 기프티콘 발송 시에만 활용되며 행사 종료 후 안전하게 파기됩니다.</p>`;
-      }
+    formQuestions.forEach(q => {
+      let contentHTML = '';
+      const reqMark = q.required ? '<span class="q-required">*</span>' : '';
+      const helperHTML = q.helper ? `<p class="q-helper">${escapeHTML(q.helper)}</p>` : '';
 
       if (q.type === 'scale') {
         contentHTML = `
           <div class="scale-labels"><span>매우 불만족(1)</span><span>매우 만족(5)</span></div>
           <div class="scale-options">
-            ${[1,2,3,4,5].map(val =>
-              `<div class="scale-option"><label><input type="radio" name="${q.id}" value="${val}"><span>${val}</span></label></div>`
-            ).join('')}
+            ${[1,2,3,4,5].map(val => `
+              <div class="scale-option"><label><input type="radio" name="${q.id}" value="${val}"><span>${val}</span></label></div>
+            `).join('')}
           </div>`;
       } else if (q.type === 'radio') {
-        contentHTML = `<div class="radio-list">` +
-          q.options.map(opt =>
-            `<div class="radio-item"><label><input type="radio" name="${q.id}" value="${opt}">${opt}</label></div>`
-          ).join('') +
-          `</div>`;
+        const options = Array.isArray(q.options) && q.options.length ? q.options : ['옵션 1'];
+        contentHTML = `<div class="radio-list">${options.map(opt => `
+          <div class="radio-item"><label><input type="radio" name="${q.id}" value="${escapeHTML(opt)}">${escapeHTML(opt)}</label></div>
+        `).join('')}</div>`;
       } else if (q.type === 'text') {
         contentHTML = `<input type="text" class="text-input" name="${q.id}" placeholder="내용을 입력해주세요">`;
       } else if (q.type === 'textarea') {
@@ -990,8 +1333,8 @@
 
       container.insertAdjacentHTML('beforeend', `
         <div class="q-block" data-id="${q.id}" data-type="${q.type}" data-required="${q.required}">
-          <label class="q-label">${q.title} ${reqMark}</label>
-          ${extraDesc}
+          <label class="q-label">${escapeHTML(q.title)} ${reqMark}</label>
+          ${helperHTML}
           ${contentHTML}
         </div>
       `);
@@ -1008,24 +1351,22 @@
   window.submitSurvey = async function() {
     const payload = { createdAt: new Date().toISOString() };
     let isValid = true;
-    let userName = "";
+    let userName = '';
 
     document.querySelectorAll('#fFormContainer .q-block').forEach(block => {
       if (!block.dataset.id) return;
-      const id    = block.dataset.id;
-      const type  = block.dataset.type;
+      const id = block.dataset.id;
+      const type = block.dataset.type;
       const isReq = block.dataset.required === 'true';
-      let val     = null;
+      let val = null;
 
       if (type === 'scale' || type === 'radio') {
         const checked = block.querySelector(`input[name="${id}"]:checked`);
-        val = checked ? (type === 'scale' ? parseInt(checked.value) : checked.value) : null;
+        val = checked ? (type === 'scale' ? parseInt(checked.value, 10) : checked.value) : null;
       } else {
         const input = block.querySelector(`[name="${id}"]`);
         val = input ? input.value.trim() : null;
-        if (val && (id === 'q_name' || block.querySelector('.q-label').innerText.includes('성명'))) {
-          userName = val;
-        }
+        if (val && id === 'q_name') userName = val;
       }
 
       if (isReq && (val === null || val === '')) {
@@ -1040,19 +1381,19 @@
     });
 
     if (!isValid) {
-      showToast('필수 문항을 모두 입력해 주세요. (빨간색 테두리 표시)');
+      showToast('필수 문항을 모두 입력해 주세요.');
       const firstErr = document.querySelector('#fFormContainer .q-block[style*="border"]');
       if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
-    showLoading(true);
+    showLoading(true, '설문 제출 중...');
     try {
       if (!isLocalMode && db && auth) {
         if (!auth.currentUser) await initAuth();
         await addDoc(getResponsesColRef(currentEventId), payload);
       } else {
-        throw new Error("DB 연결 없음 (Local Environment)");
+        throw new Error('DB 연결 없음');
       }
     } catch (e) {
       const localData = JSON.parse(localStorage.getItem(`tm_survey_responses_${currentEventId}`) || '[]');
@@ -1061,11 +1402,7 @@
     }
 
     const completeTitleEl = document.getElementById('completeMsgTitle');
-    if (userName) {
-      completeTitleEl.innerText = `${userName}님, 소중한 의견이 잘 전달되었습니다!`;
-    } else {
-      completeTitleEl.innerText = `소중한 의견이 잘 전달되었습니다!`;
-    }
+    completeTitleEl.innerText = userName ? `${userName}님, 소중한 의견이 잘 전달되었습니다!` : '소중한 의견이 잘 전달되었습니다!';
 
     document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
     document.getElementById('viewComplete').classList.add('active');
@@ -1073,286 +1410,271 @@
     showLoading(false);
 
     if (typeof confetti === 'function') {
-      confetti({
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#0A7A6E', '#5DCAA5', '#1A3A5C', '#C47A00']
-      });
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#0A7A6E', '#5DCAA5', '#1A3A5C', '#C47A00'] });
     }
   };
 
-  window.resetSurveyData = async function() {
-    if (!confirm(`⚠️ 경고: [${currentEventId}]의 모든 응답 데이터가 삭제됩니다.\n테스트 완료 후 실제 고객에게 배포하기 전에만 사용하세요.\n정말 초기화 하시겠습니까?`)) {
-      return;
-    }
-
-    showLoading(true);
+  async function getResponses() {
+    const responses = [];
     try {
-      if (!isLocalMode && db && auth) {
+      if (!isLocalMode && db && auth && auth.currentUser) {
         const snap = await getDocs(getResponsesColRef(currentEventId));
-        const deletePromises = [];
-        snap.forEach(d => {
-          deletePromises.push(deleteDoc(doc(db, getResponsesColRef(currentEventId).path, d.id)));
-        });
-        await Promise.all(deletePromises);
+        snap.forEach(d => responses.push({ _id: d.id, ...d.data() }));
+      } else {
+        throw new Error('DB 연결 없음');
       }
-      
-      localStorage.removeItem(`tm_survey_responses_${currentEventId}`);
-      
-      showToast(`[${currentEventId}] 데이터가 모두 초기화 되었습니다. 이제 배포하셔도 좋습니다!`);
-      fetchAndRenderDashboard(); 
-    } catch (error) {
-      console.error("데이터 초기화 중 오류:", error);
-      showToast("초기화 중 오류가 발생했습니다.");
+    } catch (e) {
+      const localData = JSON.parse(localStorage.getItem(`tm_survey_responses_${currentEventId}`) || '[]');
+      responses.push(...localData.map((r, i) => ({ _id: `local_${i}`, ...r })));
     }
+
+    return responses.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }
+
+  async function fetchAndRenderDashboard() {
+    showLoading(true, '응답 데이터 분석 중...');
+    cachedResponses = await getResponses();
+    renderDashboard(cachedResponses);
     showLoading(false);
-  };
+  }
 
-  /* =========================================================
-     ★ [업데이트] 데이터 보정 모드 및 인쇄
-  ========================================================= */
-  window.isEditMode = false;
-  window.toggleEditMode = function() {
-    window.isEditMode = !window.isEditMode;
-    const dashboard = document.getElementById('viewDashboard');
-    const btn       = document.getElementById('btnEditMode');
-
-    if (window.isEditMode) {
-      dashboard.classList.add('edit-mode');
-      btn.innerHTML    = '✅ 보정 완료';
-      btn.style.background = 'var(--teal)';
-      // 모든 보정 가능 필드를 활성화
-      document.querySelectorAll('.editable-field').forEach(el => el.setAttribute('contenteditable', 'true'));
-      showToast('보고서 보정 모드가 켜졌습니다.\n점수, 퍼센트(%), 텍스트를 클릭하여 수정하세요.');
+  function renderDistributionBadge() {
+    const badge = document.getElementById('dDistBadge');
+    if (!badge) return;
+    if (currentConfig.lastDistributedAt) {
+      const dTimeStr = new Date(currentConfig.lastDistributedAt).toLocaleString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      badge.innerText = `최근 배포: ${dTimeStr}`;
     } else {
-      dashboard.classList.remove('edit-mode');
-      btn.innerHTML    = '✏️ 데이터 보정';
-      btn.style.background = 'var(--slate)';
-      document.querySelectorAll('.editable-field').forEach(el => el.setAttribute('contenteditable', 'false'));
+      badge.innerText = '최근 배포: 기록 없음';
     }
-  };
+  }
 
-  window.printReport = function() {
-    // 인쇄 전 보정 모드 해제
-    if (window.isEditMode) {
-      window.toggleEditMode();
-    }
-    window.print();
-  };
+  function getScaleQuestions() {
+    return currentConfig.questions.filter(q => q.type === 'scale');
+  }
 
-  // 실시간 보정 시 막대그래프 동기화
+  function getOtherQuestions() {
+    return currentConfig.questions.filter(q => q.type === 'radio');
+  }
+
+  // 실시간 보정 시 막대그래프 길이 자동 업데이트 (이벤트 위임)
   document.addEventListener('input', function(e) {
     if (e.target.classList && e.target.classList.contains('editable-dist')) {
       const match = e.target.innerText.match(/(\d+)/);
       let val = match ? parseInt(match[1]) : 0;
       if (val > 100) val = 100;
-      const bar = e.target.closest('.dist-row').querySelector('.dist-bar-fill');
-      if (bar) bar.style.width = val + '%';
-    }
-    if (e.target.classList && e.target.classList.contains('editable-radio-dist')) {
-      const match = e.target.innerText.match(/(\d+)/);
-      let val = match ? parseInt(match[1]) : 0;
-      if (val > 100) val = 100;
-      const bar = e.target.closest('.bar-chart-item').querySelector('.bar-chart-fill');
+      const bar = e.target.closest('.dist-row')?.querySelector('.dist-bar-fill');
       if (bar) bar.style.width = val + '%';
     }
   });
 
-  /* =========================================================
-     ★ 대시보드 렌더링 (DB값은 1~5, 표기는 10점 만점 환산)
-  ========================================================= */
-  async function fetchAndRenderDashboard() {
-    showLoading(true);
-    window.isEditMode = false;
-    document.getElementById('viewDashboard').classList.remove('edit-mode');
-    const btnEdit = document.getElementById('btnEditMode');
-    if (btnEdit) {
-      btnEdit.innerHTML    = '✏️ 데이터 보정';
-      btnEdit.style.background = 'var(--slate)';
-    }
+  function renderDashboard(responses) {
+    renderDistributionBadge();
 
-    const badgeEl = document.getElementById('dDistBadge');
-    if (currentConfig.lastDistributedAt) {
-      const dTime = new Date(currentConfig.lastDistributedAt).toLocaleString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      badgeEl.innerText = `최근 배포: ${dTime}`;
-    } else {
-      badgeEl.innerText = `최근 배포: 기록없음`;
-    }
+    const scaleQuestions = getScaleQuestions();
+    const allScaleValues = [];
 
-    let responses = [];
-    try {
-      if (!isLocalMode && db && auth) {
-        if (!auth.currentUser) await initAuth();
-        const snap = await getDocs(getResponsesColRef(currentEventId));
-        snap.forEach(d => responses.push(d.data()));
-      } else {
-        throw new Error("DB 연결 없음 (Local Environment)");
-      }
-    } catch (e) {
-      responses = JSON.parse(localStorage.getItem(`tm_survey_responses_${currentEventId}`) || '[]');
-    }
+    scaleQuestions.forEach(q => {
+      responses.forEach(r => {
+        const val = Number(r[q.id]);
+        if (Number.isFinite(val) && val > 0) allScaleValues.push(val);
+      });
+    });
 
-    const count = responses.length;
-    document.getElementById('dTotalCount').innerText = `${count}명`;
-    const fbList          = document.getElementById('dFeedbackList');
-    const otherStats      = document.getElementById('dOtherStatsContainer');
-    const detailedContainer = document.getElementById('dDetailedStatsContainer');
-    const timelineList    = document.getElementById('dTimelineList');
+    const totalCount = responses.length;
+    const avg5 = allScaleValues.length ? allScaleValues.reduce((a, b) => a + b, 0) / allScaleValues.length : 0;
+    const avg10 = avg5 ? avg5 * 2 : 0;
 
-    fbList.innerHTML = '';
-    otherStats.innerHTML = '';
-    detailedContainer.innerHTML = '';
-    timelineList.innerHTML = '';
+    document.getElementById('dTotalCount').innerText = `${totalCount}명`;
+    document.getElementById('dTotalAvg').innerText = `${avg10.toFixed(1)}점`;
 
-    if (count === 0) {
-      document.getElementById('dTotalAvg').innerText = `0.0점`;
-      fbList.innerHTML = '<p style="color:var(--slate);">제출된 응답이 없습니다.</p>';
-      timelineList.innerHTML = '<div style="padding: 16px; color:var(--slate); text-align:center;">수집된 응답이 없습니다.</div>';
-      showLoading(false);
+    renderScaleStats(responses, scaleQuestions);
+    renderOtherStats(responses);
+    renderTimeline(responses);
+    renderFeedback(responses);
+  }
+
+  function renderScaleStats(responses, scaleQuestions) {
+    const container = document.getElementById('dDetailedStatsContainer');
+    container.innerHTML = '';
+
+    if (!scaleQuestions.length) {
+      container.innerHTML = '<div style="color:var(--slate); font-size:14px;">평가용 척도 문항이 없습니다.</div>';
       return;
     }
 
-    const sortedResponses = [...responses].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-    sortedResponses.forEach((res, index) => {
-      const tDate = new Date(res.createdAt);
-      const timeStr = tDate.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      
-      let uName = "익명 응답자";
-      for(let key in res) {
-         const qDef = currentConfig.questions.find(q => q.id === key);
-         if (qDef && (qDef.id === 'q_name' || qDef.title.includes('성명'))) {
-            if (res[key]) uName = res[key];
-         }
-      }
-      const isNew = index === 0 ? '<span class="badge-new">NEW</span>' : '';
-      timelineList.insertAdjacentHTML('beforeend', `
-        <div class="timeline-item">
-          <div class="name">👤 ${uName} ${isNew}</div>
-          <div class="time">${timeStr}</div>
+    scaleQuestions.forEach(q => {
+      const values = responses.map(r => Number(r[q.id])).filter(v => Number.isFinite(v) && v > 0);
+      const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+      const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      values.forEach(v => { if (counts[v] !== undefined) counts[v] += 1; });
+      const maxCount = Math.max(...Object.values(counts), 1);
+
+      const distRows = [5,4,3,2,1].map(score => {
+        const pct = values.length ? (counts[score] / values.length) * 100 : 0;
+        const width = maxCount ? (counts[score] / maxCount) * 100 : 0;
+        return `
+          <div class="dist-row">
+            <div class="dist-label">${score}점</div>
+            <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${width}%;"></div></div>
+            <div class="dist-pct editable-field editable-dist">${pct.toFixed(0)}%</div>
+          </div>
+        `;
+      }).join('');
+
+      container.insertAdjacentHTML('beforeend', `
+        <div class="report-card">
+          <div class="report-q-title editable-field">${escapeHTML(q.title)}</div>
+          <div class="report-body">
+            <div class="report-avg">
+              <div class="num editable-field">${avg ? (avg * 2).toFixed(1) : '0.0'}</div>
+              <div class="txt">10점 환산</div>
+            </div>
+            <div class="report-dist">${distRows}</div>
+          </div>
         </div>
       `);
     });
-
-    const scaleQs = currentConfig.questions.filter(q => q.type === 'scale');
-    const radioQs = currentConfig.questions.filter(q => q.type === 'radio');
-    const textQs  = currentConfig.questions.filter(q => q.type === 'text' || q.type === 'textarea');
-
-    if (scaleQs.length > 0) {
-      let grandTotalAvg = 0;
-      let detailedHTML  = '';
-
-      scaleQs.forEach((q, idx) => {
-        let sum = 0, validCount = 0;
-        // DB는 5점 척도 기준이므로 5~1 세팅
-        const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-
-        responses.forEach(r => {
-          if (r[q.id] != null) {
-            sum += r[q.id];
-            validCount++;
-            dist[r[q.id]]++;
-          }
-        });
-
-        // avg는 5점 만점 기준의 평균
-        const avg = validCount > 0 ? sum / validCount : 0;
-        grandTotalAvg += avg;
-
-        let distRowsHTML = '';
-        for (let i = 5; i >= 1; i--) {
-          const pct = validCount > 0 ? Math.round((dist[i] / validCount) * 100) : 0;
-          distRowsHTML += `
-            <div class="dist-row">
-              <span class="dist-label">${i}점</span>
-              <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${pct}%"></div></div>
-              <span class="dist-pct editable-field editable-dist" contenteditable="false">${pct}%</span>
-            </div>
-          `;
-        }
-
-        detailedHTML += `
-          <div class="report-card">
-            <div class="report-q-title">${idx + 1}. ${q.title}</div>
-            <div class="report-body">
-              <div class="report-avg">
-                <!-- 10점 만점 환산을 위해 x2 배수 처리 -->
-                <div class="num editable-field" contenteditable="false">${(avg * 2).toFixed(1)}</div>
-                <div class="txt">10점 만점 환산</div>
-              </div>
-              <div class="report-dist">${distRowsHTML}</div>
-            </div>
-          </div>
-        `;
-      });
-
-      // 전체 평균 또한 10점 만점으로 스케일업
-      document.getElementById('dTotalAvg').innerText = `${((grandTotalAvg / scaleQs.length) * 2).toFixed(1)}점`;
-      detailedContainer.innerHTML = detailedHTML;
-    } else {
-      document.getElementById('dTotalAvg').innerText = `-`;
-    }
-
-    radioQs.forEach(q => {
-      const tally = {};
-      q.options.forEach(opt => { tally[opt] = 0; });
-      let answeredCount = 0;
-
-      responses.forEach(r => {
-        if (r[q.id] != null) {
-          tally[r[q.id]] = (tally[r[q.id]] || 0) + 1;
-          answeredCount++;
-        }
-      });
-
-      let barsHTML = '';
-      for (const [opt, val] of Object.entries(tally)) {
-        const percent = answeredCount > 0 ? Math.round((val / answeredCount) * 100) : 0;
-        barsHTML += `
-          <div class="bar-chart-item">
-            <div class="bar-chart-label">
-              <span>${opt}</span>
-              <span class="editable-field editable-radio-dist" contenteditable="false">${percent}% (${val}명)</span>
-            </div>
-            <div class="bar-chart-track"><div class="bar-chart-fill" style="width:${percent}%"></div></div>
-          </div>
-        `;
-      }
-
-      otherStats.insertAdjacentHTML('beforeend', `
-        <div class="section-card">
-          <div class="section-title" style="font-size:16px;">📊 ${q.title}</div>
-          ${barsHTML}
-        </div>
-      `);
-    });
-
-    // ★ 주관식 리스트에서 이름/연락처 항목은 자동 제외 처리
-    responses.forEach(res => {
-      let hasFb = false;
-      const writeTime = new Date(res.createdAt).toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      let html  = `<div class="feedback-meta"><span>📅 ${writeTime} 접수</span></div>`;
-
-      textQs.forEach(q => {
-        // 이름/연락처와 관련된 질문 아이디나 키워드가 포함되면 리스트에서 제외
-        if (q.id === 'q_name' || q.id === 'q_contact' || q.title.includes('성명') || q.title.includes('연락처')) return;
-
-        if (res[q.id]) {
-          hasFb = true;
-          html += `<div class="feedback-q">${q.title}</div><div class="editable-field" contenteditable="false" style="white-space:pre-wrap;">${res[q.id]}</div>`;
-        }
-      });
-
-      if (hasFb) fbList.insertAdjacentHTML('beforeend', `<div class="feedback-item">${html}</div>`);
-    });
-
-    if (fbList.innerHTML === '') fbList.innerHTML = '<p style="color:var(--slate);">작성된 주관식 의견이 없습니다.</p>';
-
-    showLoading(false);
   }
 
-</script>
+  function renderOtherStats(responses) {
+    const container = document.getElementById('dOtherStatsContainer');
+    container.innerHTML = '';
 
+    const radioQuestions = getOtherQuestions();
+    radioQuestions.forEach(q => {
+      const values = responses.map(r => r[q.id]).filter(Boolean);
+      const counts = {};
+      values.forEach(v => counts[v] = (counts[v] || 0) + 1);
+      const total = values.length || 1;
+      const rows = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([label, count]) => {
+          const pct = (count / total) * 100;
+          return `
+            <div class="bar-chart-item">
+              <div class="bar-chart-label"><span class="editable-field">${escapeHTML(label)}</span><span class="editable-field">${count}명 (${pct.toFixed(0)}%)</span></div>
+              <div class="bar-chart-track"><div class="bar-chart-fill" style="width:${pct}%;"></div></div>
+            </div>
+          `;
+        }).join('');
+
+      container.insertAdjacentHTML('beforeend', `
+        <div class="section-card">
+          <div class="section-title editable-field" style="font-size:16px; margin-bottom:16px;">${escapeHTML(q.title)}</div>
+          <div>${rows || '<div style="color:var(--slate); font-size:14px;">응답 없음</div>'}</div>
+        </div>
+      `);
+    });
+  }
+
+  function renderTimeline(responses) {
+    const container = document.getElementById('dTimelineList');
+    if (!responses.length) {
+      container.innerHTML = '<div style="padding:16px; color:var(--slate); font-size:14px; text-align:center;">아직 등록된 응답이 없습니다.</div>';
+      return;
+    }
+
+    const now = Date.now();
+    container.innerHTML = responses.map((r, idx) => {
+      const created = r.createdAt ? new Date(r.createdAt) : null;
+      const timeText = created ? created.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '시간 정보 없음';
+      const isNew = created && now - created.getTime() < 1000 * 60 * 60 * 3;
+      const name = r.q_name ? escapeHTML(r.q_name) : `익명 응답 ${responses.length - idx}`;
+      return `
+        <div class="timeline-item">
+          <div class="name">👤 ${name} ${isNew ? '<span class="badge-new">NEW</span>' : ''}</div>
+          <div class="time">${timeText}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderFeedback(responses) {
+    const feedbackList = document.getElementById('dFeedbackList');
+
+    // 개인정보 항목(이름, 연락처)을 철저히 배제하고 순수 텍스트 의견 문항만 필터링
+    const textQuestions = currentConfig.questions
+      .filter(q => q.type === 'textarea' || ['q_feedback', 'q_fb', 'q_idea'].includes(q.id))
+      .filter(q => q.id !== 'q_name' && q.id !== 'q_contact' && !String(q.title).includes('성명') && !String(q.title).includes('연락처'));
+
+    const groupedQuestions = [];
+    const usedIds = new Set();
+
+    textQuestions.forEach(q => {
+      const answers = responses
+        .map((response) => {
+          const value = response[q.id];
+          if (!value || !String(value).trim()) return null;
+          usedIds.add(q.id);
+
+          return `
+            <div class="feedback-item">
+              <div class="feedback-text editable-field">${escapeHTML(value)}</div>
+            </div>
+          `;
+        })
+        .filter(Boolean);
+
+      if (answers.length > 0) {
+        groupedQuestions.push(`
+          <div class="feedback-question-group">
+            <div class="feedback-question-title editable-field">${escapeHTML(q.title)}</div>
+            <div class="feedback-answer-list">${answers.join('')}</div>
+          </div>
+        `);
+      }
+    });
+
+    feedbackList.innerHTML = groupedQuestions.length
+      ? groupedQuestions.join('')
+      : '<div style="color:var(--slate); font-size:14px;">아직 등록된 주관식 의견이 없습니다.</div>';
+  }
+
+  window.resetSurveyData = async function() {
+    if (!confirm(`⚠️ 경고: [${currentEventId}]의 모든 응답 데이터가 삭제됩니다.\n테스트 완료 후 실제 고객에게 배포하기 전에만 사용하세요.\n정말 초기화 하시겠습니까?`)) return;
+
+    showLoading(true, '응답 데이터 초기화 중...');
+    try {
+      if (!isLocalMode && db && auth && auth.currentUser) {
+        const snap = await getDocs(getResponsesColRef(currentEventId));
+        const deletePromises = [];
+        snap.forEach(d => deletePromises.push(deleteDoc(doc(db, getResponsesColRef(currentEventId).path, d.id))));
+        await Promise.all(deletePromises);
+      }
+      localStorage.removeItem(`tm_survey_responses_${currentEventId}`);
+      showToast(`[${currentEventId}] 응답 데이터가 초기화되었습니다.`);
+      await fetchAndRenderDashboard();
+    } catch (error) {
+      console.error('데이터 초기화 오류:', error);
+      showToast('초기화 중 오류가 발생했습니다.');
+    }
+    showLoading(false);
+  };
+
+  window.toggleEditMode = function() {
+    window.isEditMode = !window.isEditMode;
+    document.body.classList.toggle('edit-mode', window.isEditMode);
+    document.querySelectorAll('.editable-field').forEach(el => {
+      el.contentEditable = window.isEditMode ? 'true' : 'false';
+    });
+    document.getElementById('btnEditMode').innerText = window.isEditMode ? '✅ 보정 완료' : '✏️ 데이터 보정';
+    showToast(window.isEditMode ? '데이터 보정 모드가 켜졌습니다. 화면의 주요 문구를 직접 수정할 수 있습니다.' : '데이터 보정 모드가 종료되었습니다.');
+  };
+
+  window.printReport = function() {
+    if (window.isEditMode) window.toggleEditMode();
+    const activeBefore = Array.from(document.querySelectorAll('.view-section')).find(sec => sec.classList.contains('active'))?.id;
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById('viewDashboard').classList.add('active');
+    window.print();
+    if (activeBefore) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(activeBefore).classList.add('active');
+    }
+  };
+
+  boot();
+</script>
 </body>
 </html>
