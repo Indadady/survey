@@ -222,6 +222,19 @@
     border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
   }
 
+  /* ================= 보고서 데이터 보정(편집) 모드 스타일 ================= */
+  .edit-mode .editable-field {
+    border: 1px dashed var(--teal);
+    background: rgba(10, 122, 110, 0.08) !important;
+    border-radius: 4px;
+    cursor: text;
+    padding: 2px 4px;
+  }
+  .edit-mode .editable-field:focus {
+    outline: 2px solid var(--teal);
+    background: #fff !important;
+  }
+
   .footer-box { text-align: center; padding: 24px 16px; font-size: 12px; color: #6c757d; margin-top: 40px; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 8px; }
   .footer-box a { color: #6c757d; text-decoration: none; font-weight: bold; }
   .print-footer-logo { display: none; }
@@ -234,7 +247,7 @@
   .spinner { width: 40px; height: 40px; border: 4px solid var(--teal-light); border-top: 4px solid var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-  /* ================= 인쇄(PDF) 최적화 (편집 모드 강제 숨김 포함) ================= */
+  /* ================= 인쇄(PDF) 최적화 ================= */
   @media print {
     body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; }
     .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode { display: none !important; }
@@ -300,7 +313,20 @@
 <div class="main">
   <!-- 1. 빌더 뷰 -->
   <div id="viewBuilder" class="view-section active">
-    <div class="builder-item card-header-offset" style="border-top: 8px solid var(--navy);">
+    
+    <!-- 행사 고유 코드(Event ID) 관리 블록 -->
+    <div class="builder-item card-header-offset" style="border-top: 8px solid var(--teal); background: var(--teal-light); border-color: var(--teal-mid); padding: 20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="flex-grow: 1;">
+          <label class="b-label" style="color:var(--navy); font-size:14px;">🔑 행사 고유 코드 (Event ID)</label>
+          <p style="font-size:12px; color:var(--slate); margin-bottom:8px;">출발일과 장소를 조합하여 입력하세요. 이 코드가 다르면 데이터가 섞이지 않습니다.</p>
+          <input type="text" class="b-input" id="bEventId" placeholder="예: 260512_Osaka" style="max-width: 300px; border-color: var(--teal-mid);">
+        </div>
+        <button class="print-btn" onclick="loadEventData()" style="background:var(--teal); margin-top: 10px;">데이터 불러오기 🔄</button>
+      </div>
+    </div>
+
+    <div class="builder-item">
       <textarea class="b-input title-input auto-expand" id="bTitle" placeholder="설문지 제목" rows="1" style="border:none; border-bottom:1px solid var(--border); font-size:24px; padding:12px 0; font-weight:700;"></textarea>
       <textarea class="b-input auto-expand" id="bDesc" placeholder="설문지 설명 및 안내 문구" rows="1" style="border:none; padding:12px 0; min-height:60px; margin-top:8px;"></textarea>
     </div>
@@ -317,9 +343,9 @@
     <button class="primary-btn" onclick="submitSurvey()">설문 제출하기</button>
   </div>
 
-  <!-- 3. 대시보드 뷰 (연수종료보고서 톤앤매너 + 데이터 보정 모드) -->
+  <!-- 3. 대시보드 뷰 -->
   <div id="viewDashboard" class="view-section">
-    <div class="section-card card-header-offset">
+    <div class="section-card card-header-offset" style="border-top: 8px solid var(--navy);">
       <div class="section-title" style="flex-wrap: wrap; gap: 10px;">
         <span>📊 만족도 종합 결과</span>
         <div style="display: flex; gap: 8px;">
@@ -338,9 +364,7 @@
         </div>
       </div>
       
-      <!-- 상세 보고서 문항별 통계가 들어갈 컨테이너 -->
       <div id="dDetailedStatsContainer"></div>
-      
     </div>
     <div id="dOtherStatsContainer"></div>
     <div class="section-card">
@@ -371,7 +395,6 @@
   import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
   import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  // 자동 높이 조절 (Auto-expand) 기능
   function adjustHeight(el) {
     el.style.height = 'auto';
     el.style.height = (el.scrollHeight) + 'px';
@@ -386,7 +409,9 @@
   const urlParams = new URLSearchParams(window.location.search);
   const isCustomerMode = urlParams.get('mode') === 'view'; 
   
-  // 초기 스키마
+  // 행사 고유 코드 기본값
+  let currentEventId = urlParams.get('eventId') || '260512_Osaka';
+  
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
@@ -433,16 +458,47 @@
     if(targetId === 'viewDashboard') fetchAndRenderDashboard();
   }
 
-  window.copyShareLink = function() {
+  /* =========================================================
+     [신규] URL 단축기 연동 로직 (무료 API 기반)
+     ========================================================= */
+  window.copyShareLink = async function() {
+    const inputCode = document.getElementById('bEventId').value.trim();
+    if(!inputCode) {
+      alert("행사 고유 코드를 입력하고 [저장] 후 배포해 주세요.\n(예: 260512_Osaka)");
+      return;
+    }
+    
     const url = new URL(window.location.href);
     url.searchParams.set('mode', 'view');
-    const tempInput = document.createElement("input");
-    tempInput.value = url.toString();
+    url.searchParams.set('eventId', inputCode); 
+    const longUrl = url.toString();
+    
+    showLoading(true);
+    let shareUrl = longUrl;
+    
+    try {
+      // TinyURL 무료 단축 API 활용 (CORS 이슈 우회 및 가장 안정적)
+      const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+      if(response.ok) {
+        shareUrl = await response.text();
+      } else {
+        throw new Error('API Response not ok');
+      }
+    } catch(e) {
+      console.warn("단축 URL 생성에 실패하여 원본 URL을 사용합니다.", e);
+      shareUrl = longUrl; // 실패 시 원본의 긴 주소로 안전하게 대체
+    }
+    showLoading(false);
+
+    // 클립보드 복사 로직
+    const tempInput = document.createElement("textarea");
+    tempInput.value = shareUrl;
     document.body.appendChild(tempInput);
     tempInput.select();
     document.execCommand("copy");
     document.body.removeChild(tempInput);
-    alert('배포용 링크가 복사되었습니다!\n고객은 이 링크 접속 시 관리자 메뉴를 볼 수 없습니다.');
+    
+    alert(`[${inputCode}] 행사의 배포용 단축 링크가 복사되었습니다!\n\n공유 링크: ${shareUrl}\n\n이 링크로 접속 시 고객은 관리자 메뉴를 볼 수 없습니다.`);
   };
 
   let app, auth, db;
@@ -490,7 +546,7 @@
   async function loadConfigFromDB() {
     try {
       if(db && typeof __firebase_config !== 'undefined') {
-        const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
+        const collRef = collection(db, 'artifacts', appId, 'public', 'data', `settings_${currentEventId}`);
         const snap = await getDocs(collRef);
         if (!snap.empty) { 
           currentConfig = snap.docs[0].data(); 
@@ -499,11 +555,31 @@
       }
     } catch(e) { console.warn("DB 로드 실패, Local Storage Fallback 시도"); }
 
-    const localConf = localStorage.getItem('tm_survey_config');
+    const localConf = localStorage.getItem(`tm_survey_config_${currentEventId}`);
     if (localConf) currentConfig = JSON.parse(localConf);
   }
 
+  window.loadEventData = async function() {
+    const inputCode = document.getElementById('bEventId').value.trim();
+    if (!inputCode) { alert('불러올 행사 코드를 입력해 주세요.'); return; }
+    
+    currentEventId = inputCode;
+    
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('eventId', currentEventId);
+    window.history.pushState({}, '', newUrl);
+
+    showLoading(true);
+    await loadConfigFromDB();
+    renderBuilder();
+    uiHeroTitle.innerText = currentConfig.title;
+    uiHeroDesc.innerText = currentConfig.desc;
+    showLoading(false);
+    alert(`[${currentEventId}] 행사의 설문 환경을 성공적으로 불러왔습니다.`);
+  };
+
   function renderBuilder() {
+    document.getElementById('bEventId').value = currentEventId;
     document.getElementById('bTitle').value = currentConfig.title;
     document.getElementById('bDesc').value = currentConfig.desc;
     
@@ -595,6 +671,18 @@
   }
 
   window.saveConfigData = async function() {
+    const inputCode = document.getElementById('bEventId').value.trim();
+    if(!inputCode) {
+      alert("행사 고유 코드를 반드시 입력해 주세요.");
+      document.getElementById('bEventId').focus();
+      return;
+    }
+    
+    currentEventId = inputCode;
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('eventId', currentEventId);
+    window.history.pushState({}, '', newUrl);
+
     showLoading(true);
     
     const newConfig = {
@@ -603,7 +691,8 @@
       questions: []
     };
 
-    document.querySelectorAll('.builder-item').forEach(card => {
+    document.querySelectorAll('.builder-item').forEach((card, idx) => {
+      if(idx === 0) return; 
       const type = card.querySelector('.b-q-type').value;
       const q = {
         id: card.dataset.id,
@@ -625,18 +714,18 @@
 
     try {
       if (db && typeof __firebase_config !== 'undefined') {
-        const collRef = collection(db, 'artifacts', appId, 'public', 'data', 'survey_settings');
+        const collRef = collection(db, 'artifacts', appId, 'public', 'data', `settings_${currentEventId}`);
         const snap = await getDocs(collRef);
         if(snap.empty) await addDoc(collRef, currentConfig);
-        else await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'survey_settings', snap.docs[0].id), currentConfig);
+        else await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `settings_${currentEventId}`, snap.docs[0].id), currentConfig);
       } else {
         throw new Error("Local Environment");
       }
     } catch(e) { 
-      localStorage.setItem('tm_survey_config', JSON.stringify(currentConfig));
+      localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
     }
 
-    alert('설정이 저장되었습니다. 고객 화면 탭을 확인해 보세요.');
+    alert(`[${currentEventId}] 행사 설정이 성공적으로 저장되었습니다.\n고객 화면 탭을 확인해 보세요.`);
     showLoading(false);
   };
 
@@ -730,14 +819,14 @@
     showLoading(true);
     try {
       if(db && typeof __firebase_config !== 'undefined') {
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'), payload);
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', `responses_${currentEventId}`), payload);
       } else {
         throw new Error("Local Environment");
       }
     } catch(e) { 
-      const localData = JSON.parse(localStorage.getItem('tm_survey_responses') || '[]');
+      const localData = JSON.parse(localStorage.getItem(`tm_survey_responses_${currentEventId}`) || '[]');
       localData.push(payload);
-      localStorage.setItem('tm_survey_responses', JSON.stringify(localData));
+      localStorage.setItem(`tm_survey_responses_${currentEventId}`, JSON.stringify(localData));
     }
     
     document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
@@ -746,9 +835,6 @@
     showLoading(false);
   };
 
-  /* =========================================================
-     [신규] 보고서 데이터 보정(수정) 모드 관련 로직
-     ========================================================= */
   window.isEditMode = false;
   window.toggleEditMode = function() {
     window.isEditMode = !window.isEditMode;
@@ -769,7 +855,6 @@
     }
   };
 
-  // 막대 그래프 실시간 연동 이벤트
   document.addEventListener('input', function(e) {
     if (e.target.classList && e.target.classList.contains('editable-dist')) {
       const match = e.target.innerText.match(/(\d+)/);
@@ -787,10 +872,8 @@
     }
   });
 
-
   async function fetchAndRenderDashboard() {
     showLoading(true);
-    // 탭 이동 시 수정 모드 초기화
     window.isEditMode = false;
     document.getElementById('viewDashboard').classList.remove('edit-mode');
     const btnEdit = document.getElementById('btnEditMode');
@@ -802,17 +885,16 @@
     let responses = [];
     try {
       if(db && typeof __firebase_config !== 'undefined') {
-        const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', 'survey_responses'));
+        const snap = await getDocs(collection(db, 'artifacts', appId, 'public', 'data', `responses_${currentEventId}`));
         snap.forEach(doc => responses.push(doc.data()));
       } else {
         throw new Error("Local Environment");
       }
     } catch(e) { 
-      responses = JSON.parse(localStorage.getItem('tm_survey_responses') || '[]');
+      responses = JSON.parse(localStorage.getItem(`tm_survey_responses_${currentEventId}`) || '[]');
     }
 
     const count = responses.length;
-    // 총 응답자 수 보정 가능 처리
     document.getElementById('dTotalCount').innerText = `${count}명`;
     const fbList = document.getElementById('dFeedbackList');
     const otherStats = document.getElementById('dOtherStatsContainer');
@@ -832,7 +914,6 @@
     const radioQs = currentConfig.questions.filter(q => q.type === 'radio');
     const textQs = currentConfig.questions.filter(q => q.type === 'text' || q.type === 'textarea');
 
-    // 1. Scale 통계
     if (scaleQs.length > 0) {
       let grandTotal = 0;
       let detailedHTML = '';
@@ -886,7 +967,6 @@
       document.getElementById('dTotalAvg').innerText = `-`;
     }
 
-    // 2. Radio 문항 통계
     radioQs.forEach(q => {
       const tally = {};
       q.options.forEach(opt => tally[opt] = 0);
@@ -918,7 +998,6 @@
       `);
     });
 
-    // 3. 주관식 문항 (피드백 내용 보정 가능)
     responses.forEach(res => {
       let hasFb = false;
       let html = `<div class="feedback-meta"><span>📅 ${new Date(res.createdAt).toLocaleDateString()}</span></div>`;
