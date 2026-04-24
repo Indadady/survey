@@ -588,13 +588,17 @@
   let app, auth, db;
   const appId = typeof __app_id !== 'undefined' ? __app_id : 'tourmaker-survey-gform';
 
-  const MY_FIREBASE_CONFIG = apiKey: {"AIzaSyCbWUfIHMqyVDrTt6o8h6PwDYcr5emJC1o",
-  authDomain: "tourmaker-survey.firebaseapp.com",
-  projectId: "tourmaker-survey",
-  storageBucket: "tourmaker-survey.firebasestorage.app",
-  messagingSenderId: "261580642469",
-  appId: "1:261580642469:web:25b37070c76ab57aa2d54c",
-  measurementId: "G-1XNBKXBZ0P"}; 
+  // ★ 대표님의 실제 프로젝트 정보가 괄호 { } 안에 올바르게 포함된 최종 버전입니다!
+  const MY_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCbWUfIHMqyVDrTt6o8h6PwDYcr5emJC1o",
+    authDomain: "tourmaker-survey.firebaseapp.com",
+    projectId: "tourmaker-survey",
+    storageBucket: "tourmaker-survey.firebasestorage.app",
+    messagingSenderId: "261580642469",
+    appId: "1:261580642469:web:25b37070c76ab57aa2d54c",
+    measurementId: "G-1XNBKXBZ0P"
+  };
+  
   let isLocalMode = false;
 
   const updateStatusBadge = () => {
@@ -640,12 +644,27 @@
 
   const initAuth = async () => {
     try {
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+      if (MY_FIREBASE_CONFIG) {
+        // ★ 대표님의 개인 Firebase 사용 시, 환경 충돌을 막기 위해 무조건 익명 로그인 사용
+        await signInAnonymously(auth);
+      } else if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
         await signInWithCustomToken(auth, __initial_auth_token);
       } else {
         await signInAnonymously(auth);
       }
-    } catch (error) { console.error("Auth init failed:", error); }
+    } catch (error) { 
+      console.error("Auth init failed:", error); 
+      if (error.code === 'auth/configuration-not-found') {
+        alert("⚠️ [Firebase 설정 필요]\n파이어베이스 콘솔의 왼쪽 [Authentication(인증)] 메뉴로 가셔서 화면 중앙의 '시작하기' 버튼을 누른 후, [익명] 제공업체를 켜주세요.");
+        isLocalMode = true;
+        updateStatusBadge();
+        loadConfigFromDB().then(() => {
+          renderBuilder();
+          uiHeroTitle.innerText = currentConfig.title;
+          uiHeroDesc.innerText  = currentConfig.desc;
+        });
+      }
+    }
   };
 
   if (auth) {
@@ -709,7 +728,7 @@
   };
 
   /* =========================================================
-     ★ [업데이트] 배포 링크 복사 및 시간 기록
+     배포 링크 복사 및 시간 기록
   ========================================================= */
   window.copyShareLink = async function() {
     const inputCode = document.getElementById('bEventId').value.trim();
@@ -1147,7 +1166,7 @@
   });
 
   /* =========================================================
-     ★ [업데이트] 대시보드 렌더링 (타임라인 포함)
+     대시보드 렌더링 (타임라인 포함)
   ========================================================= */
   async function fetchAndRenderDashboard() {
     showLoading(true);
