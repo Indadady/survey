@@ -705,7 +705,7 @@
   <div id="viewDashboard" class="view-section">
     <div class="section-card card-header-offset" style="border-top: 8px solid var(--navy);">
       <div class="section-title">
-        <span>📊 만족도 종합 결과</span>
+        <span id="dReportTitle">📊 만족도 종합 결과</span>
         <div id="dDistBadge" class="dist-badge">최근 배포: 기록 없음</div>
       </div>
 
@@ -806,7 +806,8 @@
       { id: "q_trans", type: "scale", title: "[수송] 이동 차량은 청결하게 관리되었으며, 운행은 안전했습니까?", required: true },
       { id: "q_guide", type: "scale", title: "[인솔·가이드] 담당 인솔자(가이드)는 전문성을 바탕으로 원활하게 행사를 이끌었습니까?", required: true },
       { id: "q_total", type: "scale", title: "[종합] 이번 행사에 대한 귀하의 전반적인 만족도는 어떠하십니까?", required: true },
-      { id: "q_feedback", type: "textarea", title: "[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.", required: false }
+      { id: "q_opinion", type: "textarea", title: "[종합의견] 이번 일정 중 가장 만족스러웠던 점과 아쉬웠던 점을 자유롭게 적어주세요.", required: true },
+      { id: "q_suggestion", type: "textarea", title: "[제안사항] 향후 행사에 반영하거나 개선해보고 싶은 의견이 있다면 자유롭게 적어주세요.", required: true }
     ],
     lastDistributedAt: null
   };
@@ -868,24 +869,23 @@
       return true;
     });
 
-    const hasUnifiedFeedback = questions.some(q => q.id === 'q_feedback');
-    const legacyFeedbacks = questions.filter(q => ['q_fb', 'q_idea'].includes(q.id));
+    const hasOpinion = questions.some(q => q.id === 'q_opinion');
+    const hasSuggestion = questions.some(q => q.id === 'q_suggestion');
+    const hasLegacyFeedback = questions.some(q => ['q_feedback', 'q_fb', 'q_idea'].includes(q.id));
     
-    // 만약 예전 데이터(q_fb, q_idea)가 있고, 통합 문항이 없다면 새로 추가
-    if (!hasUnifiedFeedback && legacyFeedbacks.length > 0) {
-      questions = questions.filter(q => !['q_fb', 'q_idea'].includes(q.id));
+    // 만약 예전 데이터(q_feedback 등)가 없고, 새로운 종합의견/제안사항 문항도 없다면 새로 추가
+    if (!hasOpinion && !hasSuggestion && !hasLegacyFeedback) {
       questions.push({
-        id: 'q_feedback',
+        id: 'q_opinion',
         type: 'textarea',
-        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
-        required: false
+        title: '[종합의견] 이번 일정 중 가장 만족스러웠던 점과 아쉬웠던 점을 자유롭게 적어주세요.',
+        required: true
       });
-    } else if (!hasUnifiedFeedback) {
       questions.push({
-        id: 'q_feedback',
+        id: 'q_suggestion',
         type: 'textarea',
-        title: '[종합의견 및 제안사항] 이번 일정 중 만족스러웠던 점, 아쉬웠던 점, 향후 행사에 적용해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
-        required: false
+        title: '[제안사항] 향후 행사에 반영하거나 개선해보고 싶은 의견이 있다면 자유롭게 적어주세요.',
+        required: true
       });
     }
 
@@ -1514,6 +1514,11 @@
   function renderDashboard(responses) {
     renderDistributionBadge();
 
+    const reportTitleEl = document.getElementById('dReportTitle');
+    if (reportTitleEl) {
+      reportTitleEl.innerText = `📊 ${currentConfig.title || '만족도 종합 결과'}`;
+    }
+
     const scaleQuestions = getScaleQuestions();
     const allScaleValues = [];
 
@@ -1638,7 +1643,7 @@
 
     // ★ 주관식 의견 문항만 필터링 (이름, 연락처 문항 원천 배제)
     const textQuestions = currentConfig.questions
-      .filter(q => q.type === 'textarea' || ['q_feedback', 'q_fb', 'q_idea'].includes(q.id))
+      .filter(q => q.type === 'textarea' || ['q_feedback', 'q_fb', 'q_idea', 'q_opinion', 'q_suggestion'].includes(q.id))
       .filter(q => q.id !== 'q_name' && q.id !== 'q_contact' && !String(q.title).includes('성명') && !String(q.title).includes('연락처'));
 
     const groupedQuestions = [];
