@@ -8,8 +8,20 @@
 <!-- 카카오톡 등 SNS 공유 시 노출되는 썸네일 및 정보 (Open Graph) -->
 <meta property="og:title" content="스마트 설문조사 플랫폼 - 투어메이커">
 <meta property="og:description" content="참여하신 행사에 대한 소중한 의견을 남겨주세요.">
-<meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png">
+<!-- id 속성을 추가하여 스크립트에서 제어할 수 있도록 함 -->
+<meta property="og:image" id="ogImage" content="https://github.com/Indadady/TourMaker_profile/blob/main/logo_paper.jpg?raw=true">
 <meta property="og:type" content="website">
+
+<!-- 랜덤 OG 썸네일 적용 스크립트 (크롤러가 JS를 해석하는 환경 대응) -->
+<script>
+  const randomLogos = [
+    "https://github.com/Indadady/TourMaker_profile/blob/main/logo_paper.jpg?raw=true",
+    "https://github.com/Indadady/TourMaker_profile/blob/main/logo_building.png?raw=true",
+    "https://github.com/Indadady/TourMaker_profile/blob/main/logo_bag.png?raw=true"
+  ];
+  const selectedLogo = randomLogos[Math.floor(Math.random() * randomLogos.length)];
+  document.getElementById('ogImage').setAttribute('content', selectedLogo);
+</script>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JLH9GD9SVR"></script>
@@ -1079,7 +1091,7 @@
     showToast(`[${currentEventId}] 행사 환경을 불러왔습니다.`);
   };
 
-  // ★ 배포 전 전체 설정 강제 저장 로직 추가
+  // ★ 배포 전 전체 설정 강제 저장 및 TinyURL 적용
   window.copyShareLink = async function() {
     if (blockCustomerMode()) return;
     const inputCode = document.getElementById('bEventId').value.trim();
@@ -1119,8 +1131,9 @@
     const longUrl = url.toString();
 
     let shareUrl = longUrl;
+    // ★ is.gd 대신 좀 더 안정적인 tinyurl.com API 사용
     try {
-      const res = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`);
+      const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
       if (res.ok) {
         const short = await res.text();
         if (short.startsWith('http')) shareUrl = short.trim();
