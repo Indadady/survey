@@ -70,6 +70,10 @@
   }
 
   body.admin-mode { padding-top: var(--nav-height); }
+  
+  /* ★ 깜빡임(FOUC) 원천 차단을 위한 고객 모드 강제 CSS */
+  body.customer-mode { padding-top: 0 !important; }
+  body.customer-mode .admin-nav { display: none !important; }
 
   button, input, textarea, select { font-family: inherit; }
 
@@ -501,10 +505,10 @@
   #toastBox.show { bottom: 30px; }
 
   #loadingOverlay {
-    display: none;
+    display: flex; /* 초기 상태를 flex로 변경하여 페이지 진입 즉시 로딩 표시 */
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,1); /* 초기 로딩시 뒷배경 안보이게 흰색 100% */
     z-index: 2000;
     justify-content: center;
     align-items: center;
@@ -623,8 +627,17 @@
 </head>
 <body class="admin-mode" id="bodyEl">
 
+<!-- ★ 렌더링(깜빡임) 원천 차단을 위한 인라인 스크립트 -->
+<script>
+  if (new URLSearchParams(window.location.search).get('mode') === 'view') {
+    document.getElementById('bodyEl').classList.remove('admin-mode');
+    document.getElementById('bodyEl').classList.add('customer-mode');
+  }
+</script>
+
 <div id="toastBox"></div>
-<div id="loadingOverlay"><div class="spinner"></div><span id="loadingMsg">데이터 처리 중...</span></div>
+<!-- 초기 로딩 시 화면을 가리기 위한 오버레이 -->
+<div id="loadingOverlay"><div class="spinner"></div><span id="loadingMsg">데이터를 준비중입니다...</span></div>
 
 <nav class="admin-nav" id="adminNav">
   <div class="nav-brand">
@@ -742,14 +755,14 @@
     </div>
   </div>
 
-  <!-- 제출 완료 화면 -->
+  <!-- 제출 완료 및 이미 제출 안내 화면 -->
   <div id="viewComplete" class="view-section">
     <div class="q-block header-block" style="text-align:center; padding:60px 20px; border-top:8px solid var(--teal);">
       <div class="complete-icon" style="font-size:64px; margin-bottom:16px;">🎉</div>
       <h2 id="completeMsgTitle" style="font-size:24px; color:var(--navy); margin-bottom:16px; font-weight:800;">소중한 의견이 잘 전달되었습니다!</h2>
       <div style="background:var(--teal-light); padding:20px; border-radius:var(--radius-sm); margin-bottom:24px; display:inline-block; text-align:left; max-width:420px;">
-        <p style="color:var(--navy); font-size:15px; margin-bottom:8px; font-weight:800;">✅ 접수 완료</p>
-        <p style="color:var(--slate); font-size:14px; line-height:1.7; margin:0;">보내주신 피드백은 성공적으로 수집되었으며, 다음 행사 준비 및 서비스 개선에 귀중한 자료로 활용하겠습니다.</p>
+        <p style="color:var(--navy); font-size:15px; margin-bottom:8px; font-weight:800;">✅ 접수 확인</p>
+        <p id="completeMsgDesc" style="color:var(--slate); font-size:14px; line-height:1.7; margin:0;">보내주신 피드백은 성공적으로 수집되었으며, 다음 행사 준비 및 서비스 개선에 귀중한 자료로 활용하겠습니다.</p>
       </div>
       <p style="color:var(--navy); font-weight:800; font-size:16px;">함께해주셔서 대단히 감사합니다. ✈️</p>
     </div>
@@ -791,7 +804,6 @@
     measurementId: "G-1XNBKXBZ0P"
   };
 
-  // ★ 디폴트: 성명/연락처 OFF, 주관식 단일 문항 통합 적용
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
@@ -816,7 +828,7 @@
   const uiHeroDesc = document.getElementById('uiHeroDesc');
   const loadingOverlay = document.getElementById('loadingOverlay');
 
-  // ★ 고객 모드에서 관리자 기능 전면 차단 로직 (보안 강화)
+  // ★ 고객 모드에서 관리자 기능 전면 차단 로직
   function blockCustomerMode() {
     if (isCustomerMode) {
       alert('관리자 화면에서만 사용할 수 있는 기능입니다.');
@@ -841,7 +853,12 @@
 
   function showLoading(show, msg = '데이터 처리 중...') {
     document.getElementById('loadingMsg').innerText = msg;
-    loadingOverlay.style.display = show ? 'flex' : 'none';
+    if (show) {
+      loadingOverlay.style.background = 'rgba(255,255,255,0.9)'; // 이후 로딩시엔 약간 투명하게
+      loadingOverlay.style.display = 'flex';
+    } else {
+      loadingOverlay.style.display = 'none';
+    }
   }
 
   window.showToast = function(msg) {
@@ -873,7 +890,6 @@
     const hasSuggestion = questions.some(q => q.id === 'q_suggestion');
     const hasLegacyFeedback = questions.some(q => ['q_feedback', 'q_fb', 'q_idea'].includes(q.id));
     
-    // 만약 예전 데이터(q_feedback 등)가 없고, 새로운 종합의견/제안사항 문항도 없다면 새로 추가
     if (!hasOpinion && !hasSuggestion && !hasLegacyFeedback) {
       questions.push({
         id: 'q_opinion',
@@ -932,11 +948,9 @@
       isLocalMode = true;
       updateStatusBadge();
       
-      // 에러 메시지 분석 후 사용자에게 안내
       if (error.code === 'auth/configuration-not-found') {
         alert('⚠️ Firebase Authentication 설정이 필요합니다.\nFirebase 콘솔 > Authentication > 익명 제공업체를 활성화해 주세요.');
       } else if (error.message && error.message.includes('requests-from-referer')) {
-        // 도메인 제한 에러를 캐치하여 로컬 모드로 조용히 넘김
         showToast('⚠️ 현재 화면은 임시 환경이므로 DB가 연결되지 않습니다.\n(도메인 보안 설정이 완벽하게 작동 중입니다! 깃허브 배포 시 정상 연동됩니다.)');
       }
     }
@@ -969,10 +983,8 @@
     currentEventId = this.value.trim();
   });
 
-  if (isCustomerMode) {
-    document.getElementById('adminNav').style.display = 'none';
-    document.getElementById('bodyEl').classList.remove('admin-mode');
-  } else {
+  // 관리자 모드 네비게이션 이벤트 리스너 (고객 모드에서는 숨겨짐)
+  if (!isCustomerMode) {
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', (e) => {
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -994,12 +1006,42 @@
     }
   }
 
+  // ★ 이미 완료한 고객인지 확인하고 바로 안내 페이지를 띄우는 함수
+  function showAlreadyCompleted() {
+    const completeTitleEl = document.getElementById('completeMsgTitle');
+    const completeDescEl = document.getElementById('completeMsgDesc');
+    
+    completeTitleEl.innerText = '이미 설문조사를 완료하였습니다.';
+    if(completeDescEl) {
+      completeDescEl.innerText = '소중한 의견을 내주셔서 대단히 감사합니다.\n제출하신 피드백은 서비스 개선을 위해 소중히 활용됩니다.';
+    }
+
+    document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById('viewComplete').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
   async function finishInitialLoad() {
     await loadConfigFromDB();
     uiHeroTitle.innerText = currentConfig.title;
     uiHeroDesc.innerText = currentConfig.desc;
-    if (isCustomerMode) switchTab('viewForm');
-    else switchTab('viewBuilder');
+    
+    // ★ 모드 및 중복 참여 여부에 따라 화면 렌더링 분기
+    if (isCustomerMode) {
+      const hasCompleted = localStorage.getItem(`tm_survey_completed_${currentEventId}`);
+      if (hasCompleted) {
+        showAlreadyCompleted(); // 중복 참여인 경우 폼 대신 완료 화면으로
+      } else {
+        switchTab('viewForm'); // 처음 참여하는 경우 정상적으로 폼 노출
+      }
+    } else {
+      switchTab('viewBuilder'); // 관리자 모드
+    }
+
+    // 모든 세팅이 완료되면 초기 로딩 화면 끄기
+    setTimeout(() => {
+      showLoading(false);
+    }, 150);
   }
 
   async function loadConfigFromDB() {
@@ -1096,7 +1138,6 @@
     showToast(`[${currentEventId}] 행사 환경을 불러왔습니다.`);
   };
 
-  // ★ 배포 전 전체 설정 강제 저장 및 TinyURL 적용
   window.copyShareLink = async function() {
     if (blockCustomerMode()) return;
     const inputCode = document.getElementById('bEventId').value.trim();
@@ -1109,16 +1150,12 @@
       alert('⚠️ 현재 로컬 테스트 모드입니다.\n이 링크를 고객에게 보내도 데이터가 서버에 취합되지 않을 수 있습니다.');
     }
 
-    // 1. 현재 화면의 모든 설정(문항, 체크박스 등)을 currentConfig 객체로 동기화
     syncBuilderStateToConfig();
-    
-    // 2. 배포 시간 기록
     const nowISO = new Date().toISOString();
     currentConfig.lastDistributedAt = nowISO;
     
     showLoading(true, '배포 링크 생성 및 저장 중...');
 
-    // 3. 링크 생성 전, DB에 현재 설정 전체를 강제 덮어쓰기 저장 (중요)
     try {
       if (!isLocalMode && db && auth && auth.currentUser) {
         await setDoc(getConfigDocRef(currentEventId), currentConfig);
@@ -1136,7 +1173,6 @@
     const longUrl = url.toString();
 
     let shareUrl = longUrl;
-    // ★ is.gd 대신 좀 더 안정적인 tinyurl.com API 사용
     try {
       const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
       if (res.ok) {
@@ -1449,8 +1485,16 @@
       localStorage.setItem(`tm_survey_responses_${currentEventId}`, JSON.stringify(localData));
     }
 
+    // ★ 로컬 스토리지에 특정 Event ID의 설문 제출 완료 플래그 저장
+    localStorage.setItem(`tm_survey_completed_${currentEventId}`, 'true');
+
     const completeTitleEl = document.getElementById('completeMsgTitle');
+    const completeDescEl = document.getElementById('completeMsgDesc');
+    
     completeTitleEl.innerText = userName ? `${userName}님, 소중한 의견이 잘 전달되었습니다!` : '소중한 의견이 잘 전달되었습니다!';
+    if(completeDescEl) {
+      completeDescEl.innerText = '보내주신 피드백은 성공적으로 수집되었으며, 다음 행사 준비 및 서비스 개선에 귀중한 자료로 활용하겠습니다.';
+    }
 
     document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
     document.getElementById('viewComplete').classList.add('active');
@@ -1505,7 +1549,6 @@
     return currentConfig.questions.filter(q => q.type === 'radio');
   }
 
-  // 실시간 보정 시 막대그래프 길이 자동 업데이트 (이벤트 위임)
   document.addEventListener('input', function(e) {
     if (e.target.classList && e.target.classList.contains('editable-dist')) {
       const match = e.target.innerText.match(/(\d+)/);
@@ -1646,7 +1689,6 @@
   function renderFeedback(responses) {
     const feedbackList = document.getElementById('dFeedbackList');
 
-    // ★ 주관식 의견 문항만 필터링 (이름, 연락처 문항 원천 배제)
     const textQuestions = currentConfig.questions
       .filter(q => q.type === 'textarea' || ['q_feedback', 'q_fb', 'q_idea', 'q_opinion', 'q_suggestion'].includes(q.id))
       .filter(q => q.id !== 'q_name' && q.id !== 'q_contact' && !String(q.title).includes('성명') && !String(q.title).includes('연락처'));
@@ -1697,6 +1739,10 @@
         await Promise.all(deletePromises);
       }
       localStorage.removeItem(`tm_survey_responses_${currentEventId}`);
+      
+      // ★ 관리자가 데이터 초기화 시, 로컬의 중복 참여 방지 플래그도 함께 리셋하여 테스트 편의성 보장
+      localStorage.removeItem(`tm_survey_completed_${currentEventId}`);
+
       showToast(`[${currentEventId}] 응답 데이터가 초기화되었습니다.`);
       await fetchAndRenderDashboard();
     } catch (error) {
