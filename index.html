@@ -1138,6 +1138,7 @@
     showToast(`[${currentEventId}] 행사 환경을 불러왔습니다.`);
   };
 
+  // ★ TinyURL 호출 삭제 및 다이렉트 URL 복사 로직으로 변경
   window.copyShareLink = async function() {
     if (blockCustomerMode()) return;
     const inputCode = document.getElementById('bEventId').value.trim();
@@ -1167,21 +1168,11 @@
       console.warn('배포 전 자동 저장 실패:', err);
     }
 
+    // 원본 주소에 고객 전용 파라미터만 붙여서 바로 생성
     const url = new URL(window.location.href);
     url.searchParams.set('mode', 'view');
     url.searchParams.set('eventId', inputCode);
-    const longUrl = url.toString();
-
-    let shareUrl = longUrl;
-    try {
-      const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-      if (res.ok) {
-        const short = await res.text();
-        if (short.startsWith('http')) shareUrl = short.trim();
-      }
-    } catch (e) {
-      console.warn('단축 URL 생성 실패, 원본 URL 사용:', e);
-    }
+    const shareUrl = url.toString();
 
     showLoading(false);
 
