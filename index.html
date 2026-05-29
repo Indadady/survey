@@ -608,44 +608,50 @@
     }
     #feedbackSectionCard .section-title { font-size: 12pt !important; margin-bottom: 10px !important; padding-bottom: 6px !important; }
     .feedback-list { gap: 10px !important; }
+    /* 주관식 그룹은 잘리지 않게 통째로 유지하되, 페이지를 넘으면 다음 장으로 */
     .feedback-question-group {
       border: 1px solid #ddd !important;
       background: #fff !important;
       padding: 10px !important;
       margin-bottom: 8px !important;
-      page-break-inside: auto !important;
-      break-inside: auto !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .feedback-item {
       border-left: 4px solid var(--teal) !important;
       background: #f7f9f8 !important;
       margin-bottom: 6px !important;
       padding: 8px 10px !important;
-      page-break-inside: auto !important;
-      break-inside: auto !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .feedback-text { font-size: 10pt !important; line-height: 1.55 !important; }
 
-    /* 2단 그리드 — 카드가 페이지를 비우지 않도록 분할 허용 */
+    /* 2단 레이아웃 — grid 대신 inline-block 사용(인쇄 시 카드 잘림 방지) */
     #dDetailedStatsContainer, #dOtherStatsContainer {
-      display: grid !important;
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 8px !important;
+      display: block !important;
+      font-size: 0 !important;          /* inline-block 사이 공백 제거 */
       margin-top: 8px !important;
     }
 
     .section-card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 8px 0 4px 0 !important; }
     .section-title { font-size: 13pt !important; margin-bottom: 10px !important; padding-bottom: 6px !important; border-bottom: 2px solid var(--teal-light) !important; }
     .report-card, #dOtherStatsContainer .section-card {
+      display: inline-block !important;
+      vertical-align: top !important;
+      width: 49% !important;
+      margin: 0 2% 8px 0 !important;
       border: 1px solid #ddd !important;
       box-shadow: none !important;
       padding: 10px !important;
-      margin-bottom: 0 !important;
+      font-size: 10pt !important;        /* 컨테이너 font-size:0 상속 복원 */
       height: auto !important;
       min-height: 0 !important;
-      page-break-inside: auto !important;
-      break-inside: auto !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
+    /* 각 행의 두 번째(짝수) 카드는 오른쪽 여백 제거 */
+    .report-card:nth-child(even), #dOtherStatsContainer .section-card:nth-child(even) { margin-right: 0 !important; }
     .report-q-title { font-size: 10pt !important; margin-bottom: 8px !important; color: var(--navy) !important; }
 
     .report-avg { padding: 10px 6px !important; width: 72px !important; border: 1px solid rgba(10,122,110,0.2) !important; background: var(--teal-light) !important; }
