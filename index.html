@@ -485,6 +485,23 @@
 
   .edit-mode .editable-field:focus { outline: 2px solid var(--teal); background: #fff !important; }
 
+  /* ===== 내부 전용 보정 영역 — 화면 보정모드에서만 보이고, 보고서/인쇄에는 절대 노출 안 됨 ===== */
+  .internal-only { display: none; }
+  .edit-mode .internal-only { display: block; }
+  .adjust-toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; background:#fff8e1; border:1px dashed #f0ad4e; border-radius:10px; padding:12px 14px; margin-bottom:18px; }
+  .adjust-toolbar .at-label { font-weight:800; color:#8a6d3b; font-size:13px; }
+  .adjust-toolbar .at-hint { font-size:12px; color:#8a6d3b; }
+  .adjust-toolbar input[type=number] { width:64px; padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; text-align:center; }
+  .adjust-toolbar button { border:none; border-radius:6px; padding:7px 13px; font-size:13px; font-weight:700; cursor:pointer; color:#fff; }
+  .adjust-editor { margin-top:14px; padding:12px 14px; background:rgba(10,122,110,0.06); border:1px dashed var(--teal); border-radius:8px; }
+  .adjust-editor .ae-title { font-size:12px; font-weight:800; color:var(--teal); margin-bottom:10px; }
+  .adjust-editor .ae-grid { display:flex; flex-wrap:wrap; gap:10px; }
+  .adjust-editor .ae-cell { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .adjust-editor .ae-cell span { font-size:11px; color:var(--slate); font-weight:700; }
+  .adjust-editor .ae-cell input { width:54px; padding:6px; border:1px solid var(--border); border-radius:6px; text-align:center; font-size:13px; }
+  .adjust-editor .ae-readout { margin-top:10px; font-size:12px; font-weight:700; color:var(--navy); }
+  .adjust-editor .ae-readout b { color:var(--teal); }
+
   #toastBox {
     position: fixed;
     bottom: -140px;
@@ -583,7 +600,7 @@
     body { background: white !important; padding: 0 !important; margin: 0 !important; color: black !important; font-size: 10.5pt; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
-    .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode, #toastBox, #loadingOverlay { display: none !important; }
+    .admin-nav, .primary-btn, .print-btn, .floating-add-btn, #btnEditMode, #toastBox, #loadingOverlay, .internal-only { display: none !important; }
     .hero { display: none !important; }
     .main { max-width: 100% !important; padding: 0 !important; }
     .card-header-offset { margin-top: 0 !important; }
@@ -981,6 +998,7 @@
     }
 
     merged.questions = questions;
+    if (!merged.adjust || typeof merged.adjust !== 'object') merged.adjust = {};
     return merged;
   }
 
@@ -1630,19 +1648,17 @@
       reportTitleEl.innerText = `📊 ${currentConfig.title || '만족도 종합 결과'}`;
     }
 
-    const scaleQuestions = getScaleQuestions();
-    const allScaleValues = [];
+    if (!currentConfig.adjust || typeof currentConfig.adjust !== 'object') currentConfig.adjust = {};
 
+    const scaleQuestions = getScaleQuestions();
+    let sumW = 0, totalW = 0;
     scaleQuestions.forEach(q => {
-      responses.forEach(r => {
-        const val = Number(r[q.id]);
-        if (Number.isFinite(val) && val > 0) allScaleValues.push(val);
-      });
+      const c = getCounts(q, responses);
+      [1, 2, 3, 4, 5].forEach(s => { sumW += s * c[s]; totalW += c[s]; });
     });
 
     const totalCount = responses.length;
-    const avg5 = allScaleValues.length ? allScaleValues.reduce((a, b) => a + b, 0) / allScaleValues.length : 0;
-    const avg10 = avg5 ? avg5 * 2 : 0;
+    const avg10 = totalW ? (sumW / totalW) * 2 : 0;
 
     document.getElementById('dTotalCount').innerText = `${totalCount}명`;
     document.getElementById('dTotalAvg').innerText = `${avg10.toFixed(1)}점`;
@@ -1651,6 +1667,40 @@
     renderOtherStats(responses);
     renderTimeline(responses);
     renderFeedback(responses);
+  }
+
+  /* ===== 점수 분포(인원수) 계산 유틸 — 보정값(currentConfig.adjust)이 있으면 그것을 단일 진실값으로 사용 ===== */
+  function rawCounts(q, responses) {
+    const c = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    (responses || []).forEach(r => { const v = Number(r[q.id]); if (c[v] !== undefined) c[v] += 1; });
+    return c;
+  }
+
+  function getCounts(q, responses) {
+    const adj = currentConfig.adjust && currentConfig.adjust[q.id];
+    if (adj) {
+      const c = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      [1, 2, 3, 4, 5].forEach(s => { const n = parseInt(adj[s]); c[s] = (Number.isFinite(n) && n > 0) ? n : 0; });
+      return c;
+    }
+    return rawCounts(q, responses);
+  }
+
+  function statsFromCounts(c) {
+    const total = [1, 2, 3, 4, 5].reduce((a, s) => a + c[s], 0);
+    const sum = [1, 2, 3, 4, 5].reduce((a, s) => a + s * c[s], 0);
+    const avg5 = total ? sum / total : 0;
+    return { total, avg5, avg10: avg5 * 2 };
+  }
+
+  function updateGlobalAvg() {
+    let sum = 0, total = 0;
+    getScaleQuestions().forEach(q => {
+      const c = getCounts(q, cachedResponses || []);
+      [1, 2, 3, 4, 5].forEach(s => { sum += s * c[s]; total += c[s]; });
+    });
+    const el = document.getElementById('dTotalAvg');
+    if (el) el.innerText = `${(total ? (sum / total) * 2 : 0).toFixed(1)}점`;
   }
 
   function renderScaleStats(responses, scaleQuestions) {
@@ -1662,39 +1712,143 @@
       return;
     }
 
-    scaleQuestions.forEach(q => {
-      const values = responses.map(r => Number(r[q.id])).filter(v => Number.isFinite(v) && v > 0);
-      const avg = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
-      const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-      values.forEach(v => { if (counts[v] !== undefined) counts[v] += 1; });
-      const maxCount = Math.max(...Object.values(counts), 1);
+    container.insertAdjacentHTML('beforeend', `
+      <div class="adjust-toolbar internal-only">
+        <span class="at-label">⚙️ 내부 보정 도구</span>
+        <span class="at-hint">(아래 인원수와 이 영역은 보고서·인쇄에 노출되지 않습니다)</span>
+        <span class="at-hint">목표 상향</span>
+        <input type="number" id="adjBoostPct" value="10" min="0" max="100"> %
+        <button style="background:var(--teal);" onclick="applyGlobalBoost()">전체 자동 상향</button>
+        <button style="background:var(--slate);" onclick="resetAdjust()">보정 초기화</button>
+        <button style="background:var(--navy);" onclick="saveAdjust()">💾 보정 저장</button>
+      </div>
+    `);
 
-      const distRows = [5,4,3,2,1].map(score => {
-        const pct = values.length ? (counts[score] / values.length) * 100 : 0;
+    scaleQuestions.forEach(q => {
+      const counts = getCounts(q, responses);
+      const { total, avg10 } = statsFromCounts(counts);
+      const maxCount = Math.max(...[1, 2, 3, 4, 5].map(s => counts[s]), 1);
+
+      const distRows = [5, 4, 3, 2, 1].map(score => {
+        const pct = total ? (counts[score] / total) * 100 : 0;
         const width = maxCount ? (counts[score] / maxCount) * 100 : 0;
         return `
-          <div class="dist-row">
+          <div class="dist-row" data-score="${score}">
             <div class="dist-label">${score}점</div>
             <div class="dist-bar-bg"><div class="dist-bar-fill" style="width:${width}%;"></div></div>
-            <div class="dist-pct editable-field editable-dist">${pct.toFixed(0)}%</div>
+            <div class="dist-pct">${pct.toFixed(0)}%</div>
           </div>
         `;
       }).join('');
 
+      const editor = `
+        <div class="adjust-editor internal-only">
+          <div class="ae-title">항목별 응답 인원 보정 (내부 전용 · 보고서/인쇄 미노출)</div>
+          <div class="ae-grid">
+            ${[5, 4, 3, 2, 1].map(s => `<div class="ae-cell"><span>${s}점</span><input type="number" min="0" data-aq="${q.id}" data-as="${s}" value="${counts[s]}" oninput="onAdjustInput('${q.id}')"></div>`).join('')}
+          </div>
+          <div class="ae-readout">보정 평균: <b class="ae-avg">${avg10.toFixed(1)}</b>점 · 반영 응답 <b class="ae-total">${total}</b>명</div>
+        </div>
+      `;
+
       container.insertAdjacentHTML('beforeend', `
-        <div class="report-card">
+        <div class="report-card" data-qid="${q.id}">
           <div class="report-q-title editable-field">${escapeHTML(q.title)}</div>
           <div class="report-body">
             <div class="report-avg">
-              <div class="num editable-field">${avg ? (avg * 2).toFixed(1) : '0.0'}</div>
+              <div class="num">${avg10.toFixed(1)}</div>
               <div class="txt">10점 환산</div>
             </div>
             <div class="report-dist">${distRows}</div>
           </div>
+          ${editor}
         </div>
       `);
     });
   }
+
+  /* ===== 항목별 인원수 입력 → 평균/분포(%) 실시간 자동 재계산 ===== */
+  window.onAdjustInput = function(qid) {
+    if (!currentConfig.adjust || typeof currentConfig.adjust !== 'object') currentConfig.adjust = {};
+    const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    document.querySelectorAll(`input[data-aq="${qid}"]`).forEach(inp => {
+      let n = parseInt(inp.value);
+      if (!Number.isFinite(n) || n < 0) n = 0;
+      counts[inp.dataset.as] = n;
+    });
+    currentConfig.adjust[qid] = counts;
+
+    const { total, avg10 } = statsFromCounts(counts);
+    const card = document.querySelector(`.report-card[data-qid="${qid}"]`);
+    if (card) {
+      const maxCount = Math.max(...[1, 2, 3, 4, 5].map(s => counts[s]), 1);
+      const numEl = card.querySelector('.report-avg .num');
+      if (numEl) numEl.textContent = avg10.toFixed(1);
+      card.querySelectorAll('.dist-row').forEach(row => {
+        const s = row.dataset.score;
+        const pct = total ? (counts[s] / total) * 100 : 0;
+        row.querySelector('.dist-pct').textContent = `${pct.toFixed(0)}%`;
+        row.querySelector('.dist-bar-fill').style.width = `${maxCount ? (counts[s] / maxCount) * 100 : 0}%`;
+      });
+      const avgB = card.querySelector('.ae-avg'); if (avgB) avgB.textContent = avg10.toFixed(1);
+      const totB = card.querySelector('.ae-total'); if (totB) totB.textContent = total;
+    }
+    updateGlobalAvg();
+  };
+
+  /* ===== 전체 척도 문항을 목표 +X% 평균으로 자동 상향(인원 이동) ===== */
+  window.applyGlobalBoost = function() {
+    if (blockCustomerMode()) return;
+    const p = parseFloat(document.getElementById('adjBoostPct').value) || 0;
+    if (!currentConfig.adjust || typeof currentConfig.adjust !== 'object') currentConfig.adjust = {};
+
+    getScaleQuestions().forEach(q => {
+      const counts = { ...getCounts(q, cachedResponses || []) };
+      const baseTotal = [1, 2, 3, 4, 5].reduce((a, s) => a + counts[s], 0);
+      if (!baseTotal) return;
+      const curAvg = [1, 2, 3, 4, 5].reduce((a, s) => a + s * counts[s], 0) / baseTotal;
+      const target = Math.min(5, curAvg * (1 + p / 100));
+      let guard = 0;
+      while (guard++ < 100000) {
+        const t = [1, 2, 3, 4, 5].reduce((a, s) => a + counts[s], 0);
+        const a = [1, 2, 3, 4, 5].reduce((x, s) => x + s * counts[s], 0) / t;
+        if (a >= target - 1e-9) break;
+        let moved = false;
+        for (let s = 1; s <= 4; s++) { if (counts[s] > 0) { counts[s] -= 1; counts[s + 1] += 1; moved = true; break; } }
+        if (!moved) break;
+      }
+      currentConfig.adjust[q.id] = counts;
+    });
+
+    renderDashboard(cachedResponses || []);
+    if (!window.isEditMode) window.toggleEditMode();
+    showToast(`전체 척도 문항을 목표 +${p}% 기준으로 자동 보정했습니다.\n(내부 인원 이동 방식 · 보고서엔 평균/%만 노출)`);
+  };
+
+  window.resetAdjust = function() {
+    if (blockCustomerMode()) return;
+    currentConfig.adjust = {};
+    renderDashboard(cachedResponses || []);
+    if (!window.isEditMode) window.toggleEditMode();
+    showToast('보정을 초기화했습니다. 실제 응답 기준으로 복원되었습니다.');
+  };
+
+  window.saveAdjust = async function() {
+    if (blockCustomerMode()) return;
+    showLoading(true, '보정 결과 저장 중...');
+    try {
+      if (!isLocalMode && db && auth && auth.currentUser) {
+        await setDoc(getConfigDocRef(currentEventId), currentConfig);
+      } else {
+        localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
+      }
+      showToast('보정 결과가 저장되었습니다.\n배포된 보고서 링크에도 동일하게 반영됩니다.');
+    } catch (e) {
+      localStorage.setItem(`tm_survey_config_${currentEventId}`, JSON.stringify(currentConfig));
+      showToast('⚠️ 로컬에만 저장되었습니다.\n서버(Firebase) 연결 상태를 확인해 주세요.');
+    }
+    showLoading(false);
+  };
 
   function renderOtherStats(responses) {
     const container = document.getElementById('dOtherStatsContainer');
