@@ -1716,9 +1716,9 @@
       <div class="adjust-toolbar internal-only">
         <span class="at-label">⚙️ 내부 보정 도구</span>
         <span class="at-hint">(아래 인원수와 이 영역은 보고서·인쇄에 노출되지 않습니다)</span>
-        <span class="at-hint">목표 상향</span>
-        <input type="number" id="adjBoostPct" value="10" min="0" max="100"> %
-        <button style="background:var(--teal);" onclick="applyGlobalBoost()">전체 자동 상향</button>
+        <span class="at-hint">목표 평균</span>
+        <input type="number" id="adjTargetScore" value="9.0" min="0" max="10" step="0.1"> 점 (10점 만점)
+        <button style="background:var(--teal);" onclick="applyTargetScore()">목표 점수로 자동 맞춤</button>
         <button style="background:var(--slate);" onclick="resetAdjust()">보정 초기화</button>
         <button style="background:var(--navy);" onclick="saveAdjust()">💾 보정 저장</button>
       </div>
@@ -1796,23 +1796,38 @@
     updateGlobalAvg();
   };
 
-  /* ===== 전체 척도 문항을 목표 +X% 평균으로 자동 상향(인원 이동) ===== */
-  window.applyGlobalBoost = function() {
+  /* ===== 목표 평균(10점 만점)을 입력하면, 기존 응답을 반영해 거기에 맞게 자동 보정 =====
+     - 상대적 항목 차이(원래 잘 받은 문항/덜 받은 문항)는 유지하며 비례 상향
+     - 낮은 점수를 준 인원을 위로 이동시키는 방식 (총 응답 인원수는 보존) */
+  window.applyTargetScore = function() {
     if (blockCustomerMode()) return;
-    const p = parseFloat(document.getElementById('adjBoostPct').value) || 0;
+    const target10 = parseFloat(document.getElementById('adjTargetScore').value);
+    if (!Number.isFinite(target10) || target10 <= 0) { showToast('목표 평균 점수를 입력해 주세요. (예: 9.3)'); return; }
+    const target5 = Math.min(5, target10 / 2);
     if (!currentConfig.adjust || typeof currentConfig.adjust !== 'object') currentConfig.adjust = {};
 
-    getScaleQuestions().forEach(q => {
+    const scaleQuestions = getScaleQuestions();
+    let gSum = 0, gTot = 0;
+    scaleQuestions.forEach(q => { const c = getCounts(q, cachedResponses || []); [1, 2, 3, 4, 5].forEach(s => { gSum += s * c[s]; gTot += c[s]; }); });
+    if (!gTot) { showToast('아직 반영할 응답 데이터가 없습니다.'); return; }
+    const curOverall5 = gSum / gTot;
+    if (target5 <= curOverall5 + 1e-9) {
+      showToast(`입력한 목표(${target10.toFixed(1)}점)가 현재 평균(${(curOverall5 * 2).toFixed(1)}점)보다 높지 않습니다.\n이 도구는 점수를 올릴 때만 사용합니다. 낮추려면 [보정 초기화] 후 항목별로 조정하세요.`);
+      return;
+    }
+    const f = target5 / curOverall5;
+
+    scaleQuestions.forEach(q => {
       const counts = { ...getCounts(q, cachedResponses || []) };
       const baseTotal = [1, 2, 3, 4, 5].reduce((a, s) => a + counts[s], 0);
       if (!baseTotal) return;
-      const curAvg = [1, 2, 3, 4, 5].reduce((a, s) => a + s * counts[s], 0) / baseTotal;
-      const target = Math.min(5, curAvg * (1 + p / 100));
+      const qAvg5 = [1, 2, 3, 4, 5].reduce((a, s) => a + s * counts[s], 0) / baseTotal;
+      const qTarget = Math.min(5, qAvg5 * f);
       let guard = 0;
       while (guard++ < 100000) {
         const t = [1, 2, 3, 4, 5].reduce((a, s) => a + counts[s], 0);
         const a = [1, 2, 3, 4, 5].reduce((x, s) => x + s * counts[s], 0) / t;
-        if (a >= target - 1e-9) break;
+        if (a >= qTarget - 1e-9) break;
         let moved = false;
         for (let s = 1; s <= 4; s++) { if (counts[s] > 0) { counts[s] -= 1; counts[s + 1] += 1; moved = true; break; } }
         if (!moved) break;
@@ -1822,7 +1837,11 @@
 
     renderDashboard(cachedResponses || []);
     if (!window.isEditMode) window.toggleEditMode();
-    showToast(`전체 척도 문항을 목표 +${p}% 기준으로 자동 보정했습니다.\n(내부 인원 이동 방식 · 보고서엔 평균/%만 노출)`);
+
+    let aSum = 0, aTot = 0;
+    scaleQuestions.forEach(q => { const c = getCounts(q, cachedResponses || []); [1, 2, 3, 4, 5].forEach(s => { aSum += s * c[s]; aTot += c[s]; }); });
+    const applied10 = aTot ? (aSum / aTot) * 2 : 0;
+    showToast(`목표 ${target10.toFixed(1)}점 기준으로 자동 보정했습니다. (실제 적용 평균 ${applied10.toFixed(1)}점)\n항목 간 상대적 차이는 유지됩니다.`);
   };
 
   window.resetAdjust = function() {
