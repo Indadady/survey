@@ -273,11 +273,56 @@
 
   .b-meta-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 12px;
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px dashed var(--border);
+  }
+
+  .event-setup-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .event-setup-steps span {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid var(--teal-mid);
+    border-radius: 999px;
+    padding: 5px 12px;
+  }
+
+  .event-name-field-wrap {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(10, 122, 110, 0.35);
+  }
+
+  .event-name-field-wrap .b-input.event-name-required {
+    border-color: var(--teal-mid);
+    font-weight: 700;
+  }
+
+  .event-name-field-wrap .b-input.event-name-missing {
+    border-color: var(--red) !important;
+    box-shadow: 0 0 0 3px rgba(226, 75, 74, 0.12);
+  }
+
+  .event-name-hint {
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .event-name-hint.warn {
+    color: var(--red);
+    font-weight: 700;
   }
 
   @media (max-width: 640px) {
@@ -813,11 +858,21 @@
       <div style="background: #fff3cd; color: #856404; padding: 12px 16px; border-radius: 6px; border: 1px solid #ffeeba; font-size: 13.5px; font-weight: 600; margin-bottom: 16px; line-height: 1.6; word-break: keep-all;">
         💡 <b>배포 전 필수 안내:</b> 현재 화면에 세팅된 문항들을 행사에 맞게 수정하여 설문지를 완성하세요. 작성이 끝나면 반드시 우측의 <b>[💾 저장 및 업데이트]</b> 버튼을 먼저 클릭한 후, 상단의 <b>[🔗 배포 링크 복사]</b>를 통해 고객에게 전달해야 정상 반영됩니다.
       </div>
+      <div class="event-setup-steps">
+        <span>① 행사 고유코드 입력</span>
+        <span>② 행사명 기입</span>
+        <span>③ 저장 및 업데이트</span>
+      </div>
       <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px;">
         <div style="flex-grow: 1;">
           <label class="b-label">🔑 행사 고유 코드 (Event ID)</label>
           <p style="font-size:12px; color:var(--slate); margin-bottom:8px;">이 코드가 다르면 데이터가 섞이지 않습니다. 행사마다 고유코드를 생성하세요. 예: 260512_Osaka</p>
           <input type="text" class="b-input" id="bEventId" placeholder="예: 260512_Osaka" style="max-width: 320px; border-color: var(--teal-mid); font-weight: bold;">
+          <div class="event-name-field-wrap">
+            <label class="b-label" for="bEventName">📋 행사명 <span style="color:var(--red); font-size:11px;">(필수 · 자동 기재)</span></label>
+            <input type="text" class="b-input event-name-required" id="bEventName" placeholder="예: 2026 마카오 협력사 해외연수">
+            <p class="event-name-hint" id="bEventNameHint">행사 고유코드 작성 후, 위와 같이 <b>행사명을 반드시 기입</b>해 주세요. 응답 화면·제출 데이터에 자동으로 들어갑니다.</p>
+          </div>
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button class="print-btn" onclick="loadEventData()" style="background:var(--slate); padding: 10px 16px;">🔄 불러오기</button>
@@ -831,15 +886,11 @@
       <textarea class="b-input auto-expand" id="bDesc" placeholder="설문지 설명 및 안내 문구" rows="1" style="border:none; padding:12px 0; min-height:60px; margin-top:8px;"></textarea>
       <div class="b-meta-grid">
         <div>
-          <label class="b-label" for="bOrgName">🏢 단체명 (자동 기재)</label>
-          <input type="text" class="b-input" id="bOrgName" placeholder="예: 강원랜드, 정선군청 가족행복과">
-        </div>
-        <div>
-          <label class="b-label" for="bEventName">📋 행사명 (자동 기재)</label>
-          <input type="text" class="b-input" id="bEventName" placeholder="예: 2026 마카오 협력사 해외연수">
+          <label class="b-label" for="bOrgName">🏢 단체명 <span style="font-weight:500; color:var(--slate); font-size:11px;">(선택 · 자동 기재)</span></label>
+          <input type="text" class="b-input" id="bOrgName" placeholder="예: 강원랜드 (없으면 비워두세요)">
         </div>
       </div>
-      <p style="font-size:12px; color:var(--slate); margin-top:10px; line-height:1.55;">응답자가 매번 적지 않아도 되도록, 위 단체명·행사명이 <b>설문 화면에 자동 표시</b>되고 <b>제출 데이터에 함께 저장</b>됩니다.</p>
+      <p style="font-size:12px; color:var(--slate); margin-top:10px; line-height:1.55;">행사명은 위 <b>①② 단계</b>에서 필수로 입력합니다. 단체명은 선택이며, 입력 시 설문 화면에 함께 표시됩니다.</p>
     </div>
 
     <!-- 개인정보 수집 설정 (기본값 꺼짐) -->
@@ -1005,6 +1056,32 @@
     };
   }
 
+  function markEventNameField(missing) {
+    const el = document.getElementById('bEventName');
+    const hint = document.getElementById('bEventNameHint');
+    if (!el) return;
+    el.classList.toggle('event-name-missing', !!missing);
+    if (hint) {
+      hint.classList.toggle('warn', !!missing);
+      hint.innerHTML = missing
+        ? '⚠️ <b>행사명을 기입해 주세요.</b> 저장·배포 전에 행사 고유코드 아래 행사명은 필수입니다.'
+        : '행사 고유코드 작성 후, 위와 같이 <b>행사명을 반드시 기입</b>해 주세요. 응답 화면·제출 데이터에 자동으로 들어갑니다.';
+    }
+  }
+
+  function validateEventNameRequired(actionLabel) {
+    const eventName = document.getElementById('bEventName')?.value.trim() || '';
+    if (eventName) {
+      markEventNameField(false);
+      return true;
+    }
+    markEventNameField(true);
+    showToast(`행사 고유코드 작성 후, 행사명을 기입해 주세요.\n[${actionLabel}] 하기 전 필수입니다.`);
+    document.getElementById('bEventName')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('bEventName')?.focus();
+    return false;
+  }
+
   /** 단체명·행사명 hero 칩 + 폼 상단 배너 동기화 */
   function syncHeroEventMeta() {
     const heroMeta = document.getElementById('heroEventMeta');
@@ -1036,7 +1113,7 @@
     return `
       <div class="event-info-banner">
         ${rows.join('')}
-        <div class="eib-note">※ 위 정보는 행사 설정에 따라 자동으로 기재됩니다. 별도 입력하지 않으셔도 됩니다.</div>
+        <div class="eib-note">※ 위 행사명은 설정에 따라 자동 기재됩니다. 별도 입력하지 않으셔도 됩니다.</div>
       </div>
     `;
   }
@@ -1211,6 +1288,10 @@
 
   document.getElementById('bEventId').addEventListener('input', function() {
     currentEventId = this.value.trim();
+  });
+
+  document.getElementById('bEventName')?.addEventListener('input', function() {
+    if (this.value.trim()) markEventNameField(false);
   });
 
   // 관리자 모드 네비게이션 이벤트 리스너 (고객 모드에서는 숨겨짐)
@@ -1393,15 +1474,13 @@
       return;
     }
 
+    if (!validateEventNameRequired('배포 링크 복사')) return;
+
     if (isLocalMode) {
       alert('⚠️ 현재 로컬 테스트 모드입니다.\n이 링크를 고객에게 보내도 데이터가 서버에 취합되지 않을 수 있습니다.');
     }
 
     syncBuilderStateToConfig();
-    const { orgName, eventName } = getEventMeta();
-    if (!orgName || !eventName) {
-      showToast('💡 단체명·행사명을 입력하면 응답자가 매번 적지 않아도 됩니다.');
-    }
     const nowISO = new Date().toISOString();
     currentConfig.lastDistributedAt = nowISO;
     
@@ -1450,6 +1529,7 @@
     const eventNameEl = document.getElementById('bEventName');
     if (orgEl) orgEl.value = currentConfig.orgName || '';
     if (eventNameEl) eventNameEl.value = currentConfig.eventName || '';
+    markEventNameField(!(currentConfig.eventName || '').trim());
     document.getElementById('bCollectIdentity').checked = !!currentConfig.collectIdentity;
     document.getElementById('bCollectContact').checked = !!currentConfig.collectContact;
 
@@ -1545,6 +1625,8 @@
       return;
     }
 
+    if (!validateEventNameRequired('저장 및 업데이트')) return;
+
     currentEventId = inputCode;
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set('eventId', currentEventId);
@@ -1609,7 +1691,7 @@
         type: 'text',
         title: '성명 및 소속',
         required: true,
-        helper: '※ 성명과 개인 소속(부서·어린이집명 등)을 입력해 주세요. 단체명·행사명은 상단에 자동 기재됩니다.'
+        helper: '※ 성명과 개인 소속(부서·어린이집명 등)을 입력해 주세요. 행사명은 상단에 자동 기재됩니다.'
       });
     }
 
