@@ -205,6 +205,85 @@
     white-space: pre-wrap;
   }
 
+  .hero-event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-event-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    backdrop-filter: blur(4px);
+  }
+
+  .hero-event-chip .chip-label {
+    opacity: 0.82;
+    font-weight: 500;
+    font-size: 12px;
+  }
+
+  .event-info-banner {
+    background: linear-gradient(135deg, var(--teal-light) 0%, #f0faf8 100%);
+    border: 1px solid var(--teal-mid);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .event-info-banner .eib-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: baseline;
+    font-size: 14px;
+    color: var(--navy);
+  }
+
+  .event-info-banner .eib-label {
+    font-weight: 800;
+    min-width: 64px;
+    color: var(--teal);
+  }
+
+  .event-info-banner .eib-value {
+    font-weight: 700;
+    flex: 1;
+  }
+
+  .event-info-banner .eib-note {
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .b-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .b-meta-grid { grid-template-columns: 1fr; }
+  }
+
   .main { max-width: 880px; margin: 0 auto; padding: 0 16px 80px; }
 
   .view-section { display: none; animation: fadeIn 0.25s ease; }
@@ -723,6 +802,7 @@
     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="투어메이커">
   </div>
   <h1 id="uiHeroTitle">로딩 중...</h1>
+  <div id="heroEventMeta" class="hero-event-meta" style="display:none;"></div>
   <p id="uiHeroDesc"></p>
 </div>
 
@@ -749,6 +829,17 @@
     <div class="builder-item builder-item-fixed" id="bTitleBlock">
       <textarea class="b-input title-input auto-expand" id="bTitle" placeholder="설문지 제목" rows="1" style="border:none; border-bottom:1px solid var(--border); font-size:24px; padding:12px 0; font-weight:800;"></textarea>
       <textarea class="b-input auto-expand" id="bDesc" placeholder="설문지 설명 및 안내 문구" rows="1" style="border:none; padding:12px 0; min-height:60px; margin-top:8px;"></textarea>
+      <div class="b-meta-grid">
+        <div>
+          <label class="b-label" for="bOrgName">🏢 단체명 (자동 기재)</label>
+          <input type="text" class="b-input" id="bOrgName" placeholder="예: 강원랜드, 정선군청 가족행복과">
+        </div>
+        <div>
+          <label class="b-label" for="bEventName">📋 행사명 (자동 기재)</label>
+          <input type="text" class="b-input" id="bEventName" placeholder="예: 2026 마카오 협력사 해외연수">
+        </div>
+      </div>
+      <p style="font-size:12px; color:var(--slate); margin-top:10px; line-height:1.55;">응답자가 매번 적지 않아도 되도록, 위 단체명·행사명이 <b>설문 화면에 자동 표시</b>되고 <b>제출 데이터에 함께 저장</b>됩니다.</p>
     </div>
 
     <!-- 개인정보 수집 설정 (기본값 꺼짐) -->
@@ -874,6 +965,8 @@
   let currentConfig = {
     title: "행사/연수 만족도 조사",
     desc: "모든 일정을 무사히 마쳤습니다.\n더 나은 서비스와 환경을 제공하기 위해 귀하의 소중한 의견을 기다립니다.",
+    orgName: "",
+    eventName: "",
     collectIdentity: false, 
     collectContact: false,
     questions: [
@@ -902,6 +995,50 @@
       return true;
     }
     return false;
+  }
+
+  function getEventMeta() {
+    return {
+      orgName: String(currentConfig.orgName || '').trim(),
+      eventName: String(currentConfig.eventName || '').trim(),
+      eventId: currentEventId
+    };
+  }
+
+  /** 단체명·행사명 hero 칩 + 폼 상단 배너 동기화 */
+  function syncHeroEventMeta() {
+    const heroMeta = document.getElementById('heroEventMeta');
+    const { orgName, eventName } = getEventMeta();
+    const chips = [];
+
+    if (orgName) chips.push(`<span class="hero-event-chip"><span class="chip-label">단체명</span>${escapeHTML(orgName)}</span>`);
+    if (eventName) chips.push(`<span class="hero-event-chip"><span class="chip-label">행사명</span>${escapeHTML(eventName)}</span>`);
+
+    if (heroMeta) {
+      if (chips.length) {
+        heroMeta.innerHTML = chips.join('');
+        heroMeta.style.display = 'flex';
+      } else {
+        heroMeta.innerHTML = '';
+        heroMeta.style.display = 'none';
+      }
+    }
+  }
+
+  function renderEventInfoBanner() {
+    const { orgName, eventName } = getEventMeta();
+    if (!orgName && !eventName) return '';
+
+    const rows = [];
+    if (orgName) rows.push(`<div class="eib-row"><span class="eib-label">단체명</span><span class="eib-value">${escapeHTML(orgName)}</span></div>`);
+    if (eventName) rows.push(`<div class="eib-row"><span class="eib-label">행사명</span><span class="eib-value">${escapeHTML(eventName)}</span></div>`);
+
+    return `
+      <div class="event-info-banner">
+        ${rows.join('')}
+        <div class="eib-note">※ 위 정보는 행사 설정에 따라 자동으로 기재됩니다. 별도 입력하지 않으셔도 됩니다.</div>
+      </div>
+    `;
   }
 
   /** 고객 설문 화면: hero 하단에 필수·익명 안내 (제목/설명과 분리된 중복 카드 없음) */
@@ -1116,8 +1253,17 @@
 
   async function finishInitialLoad() {
     await loadConfigFromDB();
+
+    if (!isCustomerMode) {
+      const urlOrg = urlParams.get('orgName');
+      const urlEvent = urlParams.get('eventName');
+      if (urlOrg && !currentConfig.orgName) currentConfig.orgName = urlOrg;
+      if (urlEvent && !currentConfig.eventName) currentConfig.eventName = urlEvent;
+    }
+
     uiHeroTitle.innerText = currentConfig.title;
     uiHeroDesc.innerText = currentConfig.desc;
+    syncHeroEventMeta();
     
     // ★ 모드 및 중복 참여 여부에 따라 화면 렌더링 분기
     if (isCustomerMode) {
@@ -1168,6 +1314,10 @@
 
     currentConfig.title = titleEl.value.trim() || currentConfig.title || '행사/연수 만족도 조사';
     currentConfig.desc = descEl.value.trim();
+    const orgEl = document.getElementById('bOrgName');
+    const eventNameEl = document.getElementById('bEventName');
+    if (orgEl) currentConfig.orgName = orgEl.value.trim();
+    if (eventNameEl) currentConfig.eventName = eventNameEl.value.trim();
     currentConfig.collectIdentity = identityEl.checked;
     currentConfig.collectContact = contactEl.checked;
 
@@ -1210,6 +1360,7 @@
     if (targetId === 'viewBuilder') renderBuilder();
     if (targetId === 'viewForm') renderForm();
     else syncHeroFormMeta();
+    syncHeroEventMeta();
     if (targetId === 'viewDashboard') fetchAndRenderDashboard();
   }
 
@@ -1228,6 +1379,7 @@
     renderBuilder();
     uiHeroTitle.innerText = currentConfig.title;
     uiHeroDesc.innerText = currentConfig.desc;
+    syncHeroEventMeta();
     showLoading(false);
     showToast(`[${currentEventId}] 행사 환경을 불러왔습니다.`);
   };
@@ -1246,6 +1398,10 @@
     }
 
     syncBuilderStateToConfig();
+    const { orgName, eventName } = getEventMeta();
+    if (!orgName || !eventName) {
+      showToast('💡 단체명·행사명을 입력하면 응답자가 매번 적지 않아도 됩니다.');
+    }
     const nowISO = new Date().toISOString();
     currentConfig.lastDistributedAt = nowISO;
     
@@ -1290,6 +1446,10 @@
     document.getElementById('bEventId').value = currentEventId;
     document.getElementById('bTitle').value = currentConfig.title || '';
     document.getElementById('bDesc').value = currentConfig.desc || '';
+    const orgEl = document.getElementById('bOrgName');
+    const eventNameEl = document.getElementById('bEventName');
+    if (orgEl) orgEl.value = currentConfig.orgName || '';
+    if (eventNameEl) eventNameEl.value = currentConfig.eventName || '';
     document.getElementById('bCollectIdentity').checked = !!currentConfig.collectIdentity;
     document.getElementById('bCollectContact').checked = !!currentConfig.collectContact;
 
@@ -1395,6 +1555,8 @@
     const newConfig = {
       title: document.getElementById('bTitle').value.trim() || '행사/연수 만족도 조사',
       desc: document.getElementById('bDesc').value.trim(),
+      orgName: document.getElementById('bOrgName')?.value.trim() || '',
+      eventName: document.getElementById('bEventName')?.value.trim() || '',
       collectIdentity: document.getElementById('bCollectIdentity')?.checked || false,
       collectContact: document.getElementById('bCollectContact')?.checked || false,
       questions: [],
@@ -1420,6 +1582,7 @@
     currentConfig = normalizeConfig(newConfig);
     uiHeroTitle.innerText = currentConfig.title;
     uiHeroDesc.innerText = currentConfig.desc;
+    syncHeroEventMeta();
 
     try {
       if (!isLocalMode && db && auth && auth.currentUser) {
@@ -1446,7 +1609,7 @@
         type: 'text',
         title: '성명 및 소속',
         required: true,
-        helper: '※ 응답 확인 및 결과 정리를 위해 성명과 소속을 입력해 주세요.'
+        helper: '※ 성명과 개인 소속(부서·어린이집명 등)을 입력해 주세요. 단체명·행사명은 상단에 자동 기재됩니다.'
       });
     }
 
@@ -1465,8 +1628,9 @@
 
   function renderForm() {
     const container = document.getElementById('fFormContainer');
-    /* 제목·설명은 hero에만 표시 — 별도 안내 카드 제거 */
-    container.innerHTML = '';
+    /* 제목·설명은 hero에만 표시 — 단체명·행사명은 자동 배ner */
+    container.innerHTML = renderEventInfoBanner();
+    syncHeroEventMeta();
     syncHeroFormMeta();
 
     const formQuestions = [...getOptionalInfoQuestions(), ...currentConfig.questions];
@@ -1514,7 +1678,13 @@
   }
 
   window.submitSurvey = async function() {
-    const payload = { createdAt: new Date().toISOString() };
+    const meta = getEventMeta();
+    const payload = {
+      createdAt: new Date().toISOString(),
+      eventId: meta.eventId,
+      orgName: meta.orgName || null,
+      eventName: meta.eventName || null
+    };
     let isValid = true;
     let userName = '';
 
@@ -1645,7 +1815,10 @@
 
     const reportTitleEl = document.getElementById('dReportTitle');
     if (reportTitleEl) {
-      reportTitleEl.innerText = `📊 ${currentConfig.title || '만족도 종합 결과'}`;
+      const { orgName, eventName } = getEventMeta();
+      const metaPart = [orgName, eventName].filter(Boolean).join(' · ');
+      const baseTitle = currentConfig.title || '만족도 종합 결과';
+      reportTitleEl.innerText = metaPart ? `📊 ${metaPart}` : `📊 ${baseTitle}`;
     }
 
     if (!currentConfig.adjust || typeof currentConfig.adjust !== 'object') currentConfig.adjust = {};
